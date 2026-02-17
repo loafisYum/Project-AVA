@@ -155,9 +155,6 @@ async function transmit() {
         );
 
         const res = await fetch(`https://text.pollinations.ai/openai/${enhancedQuery}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`);
-
-        if(!res.ok) throw new Error("Node Offline");
-
         let txt = await res.text();
 
         let clean = txt.replace(/<think>[\s\S]*?<\/think>/gi, "")
@@ -171,10 +168,11 @@ async function transmit() {
             sessionStorage.setItem("AVA_VERIFIED", "true");
         }
 
-        append("AVA", clean || "Neural lag. Signal cleared for safety.");
+        // Fallback neutral text
+        append("AVA", clean || "Antwort wird generiert…");
     } catch(e) { 
         console.error(e);
-        append("AVA", "Uplink destabilized. Retrying secure channel..."); 
+        append("AVA", "Uplink destabilized. Retrying secure channel...");
     }
     finally { sendBtn.disabled = false; }
 }
