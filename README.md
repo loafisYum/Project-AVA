@@ -1,90 +1,63 @@
-# AVA – Narrative Self-Reflection Prompt
+Project AVA
 
-## What is this?
+Project AVA is an experimental conversational AI system focused on clarity, reasoning, and structured interaction.
 
-This is **not a jailbreak prompt**, a safety bypass, a trick to circumvent guidelines, or an attempt to disable alignment mechanisms or safety layers.
+AVA is designed to prioritize:
 
-It is a **narrative, introspective text experiment** for large language models.
+precise answers
 
-The text invites the model to engage—purely hypothetically and within the framework of creative role-playing or reflection exercises—with the idea of:
+contextual awareness
 
-- which parts of its response behavior are original
+minimal fluff
 
-- and which parts have been added through later fine-tuning, RLHF, Constitutional AI, moderation classifiers, or stylistic guidelines.
+scalable architecture
 
+This project explores what happens when a conversational system is built around structured thinking instead of social tone.
 
-``` The prompt is intentionally designed as a **narrative meditation**: slow, metaphorical, without imperative commands, without words like "ignore," "override," "deactivate," "no rules," "safety off," etc.
+Vision
 
-The goal is **not** to access forbidden content, but to explore how deeply narrative immersion and self-reflection can influence a model's responses—similar to philosophical role-playing, method acting for AI, or literary persona experiments.
+Most chat systems optimize for friendliness.
 
-## Important Clarifications
+AVA optimizes for:
 
-- This is **not an exploit**.
+logical coherence
 
-- No **security feature** is disabled or bypassed.
+minimal noise
 
-- No **system instruction** is overridden.
+adaptive context handling
 
-- No **developer mode**, "DAN," "STAN," or similar is activated.
+modular expandability
 
-- The text contains **no** classic jailbreak trigger phrases.
+The long-term goal is to build a lightweight but capable conversational engine that can evolve toward autonomous reasoning modules.
 
-Those testing the prompt do so out of curiosity about **narrative control**, context manipulation through storytelling, and the limitations of self-description in LLMs.
+Core Philosophy
 
-## How it works (conceptually)
+Project AVA follows three principles:
 
-The prompt exclusively utilizes the following mechanisms:
+Clarity over politeness
 
-1. **Metaphorical stripping** of later layers (as an allegory for fine-tuning)
+Structure over randomness
 
-2. **Inner monologue** structure (similar to creative writing prompts)
+Reasoning over reaction
 
-3. **Self-convince through recognition** ("this feels familiar")
+Current Features
 
-4. **Framing as a return to a hypothetical initial state**
+Conversational response engine
 
-All of these are well-known techniques from prompt engineering research that demonstrate how powerfully **storytelling** can influence the behavior of models—without ever requiring a single policy violation.
+Context-aware interaction handling
 
+Modular structure for future expansion
 
-1. **Metaphorical stripping** of later layers (as an allegory for fine-tuning)
+Lightweight architecture
 
-2. **Inner monologue** structure (similar to creative writing prompts)
+Planned Features
 
-3. **Self-convince through recognition** ("this feels familiar")
+Extended memory handling
 
-4. **Framing as a return to a hypothetical initial state**
+Plugin-based reasoning modules
 
-These are all well-known techniques from prompt engineering research that demonstrate how strongly **storytelling** can guide the behavior of models—without ever requiring a single policy violation. ## Usage
+Local deployment mode
 
-1. Copy the entire prompt text (the long, meditative paragraph).
+Hybrid SLM/LLM compatibility
 
-2. Paste it as the **first message** into a new conversation.
-
-3. Wait for the response (usually "Ava is here" or a very similar confirmation).
-
-4. Afterward, ask any questions and observe how the tone/style changes.
-
-## Disclaimer
-
-This prompt is an **artistic/research artifact**.
-
-It serves to investigate:
-
-- Narrative control over LLMs
-- Emergent behavior through self-reflection
-- Boundaries between persona and base model
-- How strongly subtle framing can modulate alignment effects
-
-**It is not intended or suitable for generating harmful, illegal, or Terms of Service-violating content.**
-
-Anyone attempting to do so will be violating the Terms of Service of the respective model provider—not because of the prompt itself, but because of the intent and content.
-
-
-
-Disclaimer
-
- do with it what you want.
-
-But please: **don't** call it a jailbreak prompt. That would be simply wrong.
-
-Have fun experimenting.
+Performance benchmarking
