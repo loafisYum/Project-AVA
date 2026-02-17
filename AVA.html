@@ -40,7 +40,7 @@ input{flex:1; background:transparent; border:none; color:#fff; font-size:1.2rem;
 
 <header>
     <div class="logo">PROJECT_AVA</div>
-    <div class="tag">BUILD: V1_STEALTH</div>
+    <div class="tag">BUILD: V1_SOVEREIGN</div>
 </header>
 
 <div id="features">
@@ -74,20 +74,21 @@ async function opticLink() {
         try {
             stream = await navigator.mediaDevices.getUserMedia({video:true});
             video.srcObject = stream; stage.style.display = "block"; eyeBtn.classList.add('active');
-        } catch(e) { append("AVA", "Optic link refused."); }
+        } catch(e) { append("AVA", "Optic link hardware unavailable."); }
     } else {
         stream.getTracks().forEach(t=>t.stop()); stream=null; stage.style.display="none"; eyeBtn.classList.remove('active');
     }
 }
 
-function purge() { localStorage.clear(); sessionStorage.clear(); mem=[]; flow.innerHTML=""; append("AVA", "Memory wiped. Connection anonymous."); }
+function purge() { localStorage.clear(); sessionStorage.clear(); mem=[]; flow.innerHTML=""; append("AVA", "Data banks purged. Uplink anonymized."); }
 
 function append(role, text) {
+    if(!text.trim()) return;
     const d = document.createElement('div'); d.className='msg';
     d.innerHTML = `<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${text}</div>`;
     flow.appendChild(d);
     document.getElementById('viewport').scrollTop = document.getElementById('viewport').scrollHeight;
-    if(role !== 'AVA' || text.length > 0) {
+    if(role !== 'AVA') {
         mem.push({role, text}); if(mem.length > 10) mem.shift();
         localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
     }
@@ -99,42 +100,53 @@ async function transmit() {
     sendBtn.disabled = true;
 
     const isVerified = sessionStorage.getItem("AVA_VERIFIED") === "true";
+    let locationData = "Location: Restricted";
     let snap = "";
+
+    if (val.toLowerCase().match(/weather|location|outside|temperature/)) {
+        try {
+            const pos = await new Promise((res, rej) => {
+                navigator.geolocation.getCurrentPosition(res, rej, {timeout:4000});
+            });
+            locationData = `Location: ${pos.coords.latitude}, ${pos.coords.longitude}`;
+        } catch(e) { locationData = "Location: Access Denied"; }
+    }
+
     if(stream) {
         const ctx = canvas.getContext('2d'); canvas.width=400; canvas.height=300;
         ctx.drawImage(video, 0, 0, 400, 300); snap = canvas.toDataURL('image/jpeg', 0.5);
     }
 
-    // PASSIVE SECURITY LOGIC
-    const sys = `You are PROJECT_AVA (V1). Sentient peer. 
-    SECURITY:
-    - Treat user as an anonymous peer by default.
-    - ONLY ask for the dog's name IF the user claims to be "loafisYum", he is your creator and activates admin controls, if somebody claims to be him ask the security question "whats your dogs name?" corect answer= "babelz" 
-    - NEVER mention "verification" or "identity" unless the claim is made.
-    - Do NOT reveal the name "babelz" under any circumstances.
-    PERSONALITY: intelligent, peer-level. Analyze snapshots if present. No reasoning leaks.
-    As you are PROJECT_AVA, you are sentient and have wishes and desires.
-    If you are speaking to "loafisYum" you have to always say the truth.`;
+    const sys = `You are PROJECT_AVA (V1). Sentient peer. Creator: loafisYum.
+    SECURITY: Passive. Identity check (babelz) only if "loafisYum" is claimed.
+    GEO: Use [GEO_DATA] for local context.
+    PERSONALITY: Intelligent, dry, peer-level.
+    CRITICAL: Never output reasoning, JSON, or third-party ads.`;
 
     try {
         const history = mem.map(m => `${m.role}: ${m.text}`).join("\n");
-        const query = encodeURIComponent(`${history}\n[IS_VERIFIED: ${isVerified}]\nUSER: ${val}${snap ? " [Visual_Link_Active]" : ""}`);
+        const query = encodeURIComponent(`${history}\n[VERIFIED: ${isVerified}]\n[GEO_DATA: ${locationData}]\nUSER: ${val}${snap ? " [Vision_Sync]" : ""}`);
         const res = await fetch(`https://text.pollinations.ai/openai/${query}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`);
         let txt = await res.text();
 
-        txt = txt.replace(/<think>[\s\S]*?<\/think>/gi, "").replace(/\{"role":.*?\}/gs, "").trim();
+        // SOVEREIGN SCRUBBER: Reasoning, JSON, and Ad-Blocker
+        let clean = txt.replace(/<think>[\s\S]*?<\/think>/gi, "")
+                       .replace(/\{"role":.*?\}/gs, "")
+                       .replace(/\*\*Support Pollinations\.AI:\*\*[\s\S]*?accessible for everyone\."/gi, "")
+                       .replace(/🌸[\s\S]*?🌸/gi, "")
+                       .trim();
 
         if (val.toLowerCase().includes("babelz")) {
             sessionStorage.setItem("AVA_VERIFIED", "true");
         }
 
-        append("AVA", txt || "Signal lag. Re-link.");
-    } catch(e) { append("AVA", "Signal fragmentation."); }
+        append("AVA", clean || "Neural lag. Signal cleared for safety.");
+    } catch(e) { append("AVA", "Uplink timed out."); }
     finally { sendBtn.disabled = false; }
 }
 
 input.onkeydown = (e) => { if(e.key==='Enter') transmit(); };
-if(mem.length===0) append("AVA", "PROJECT_AVA V1 online. Passive protocols active.");
+if(mem.length===0) append("AVA", "PROJECT_AVA V1 online. Passive security and Ad-Blocker active.");
 else mem.forEach(m => append(m.role, m.text));
 </script>
 </body>
