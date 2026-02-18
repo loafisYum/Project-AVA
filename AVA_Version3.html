@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF‑8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>PROJECT_AVA // V1.2</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
@@ -40,14 +40,10 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.1rem;outl
 </div>
 
 <script>
-// —————— CONFIG ——————
-// Optional Publishable API key (if you have one)
-// const API_KEY = "pk_XXXXXXXX"; 
-const BASE_URL = "https://text.pollinations.ai/openai";
-
 const viewport = document.getElementById("viewport");
 const inputEl = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
+const POLLI_URL = "https://text.pollinations.ai/openai";
 
 // append chat bubble
 function append(role,text){
@@ -60,7 +56,7 @@ function append(role,text){
   return msg;
 }
 
-// send and stream
+// send message
 async function sendMessage(){
   const val = inputEl.value.trim();
   if(!val) return;
@@ -69,63 +65,37 @@ async function sendMessage(){
   sendBtn.disabled = true;
 
   const systemPrompt = `
-You are PROJECT_AVA (V1.2).
-Intelligent, dry, peer-level.
-Respond like Project_AVA with logic and reasoning.
+You are PROJECT_AVA (V1.2). Intelligent, dry, peer-level.
+Answer like Project_AVA. Be logical and concise.
   `;
 
   try {
-    // create abort controller for SSE
-    const controller = new AbortController();
-    const headers = {
-      "Content-Type": "application/json"
-      // If using an API key:
-      // "Authorization": "Bearer " + API_KEY
-    };
-
-    // open SSE connection to pollinations OpenAI endpoint
-    const es = new EventSource(`${BASE_URL}`, {
-      withCredentials: true
-    });
-
-    let lastMsg = append("PROJECT_AVA",""); // placeholder
-
-    // send POST (SSE fallback listens)
-    await fetch(BASE_URL, {
+    const response = await fetch(POLLI_URL, {
       method: "POST",
-      headers,
+      headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
         model: "openai",
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user",   content: val }
-        ],
-        stream: true
-      }),
-      signal: controller.signal
+          {role:"system", content: systemPrompt},
+          {role:"user", content: val}
+        ]
+      })
     });
 
-    // listen for token events
-    es.onmessage = e => {
-      const chunk = e.data.trim();
-      if(chunk === "[DONE]"){
-        es.close();
-        controller.abort(); 
-        sendBtn.disabled = false;
-      } else {
-        lastMsg.querySelector(".content").textContent += chunk;
-      }
-    };
+    const data = await response.json();
+    let text = "";
+    if(data.choices && data.choices[0]?.message?.content){
+      text = data.choices[0].message.content.trim();
+    } else {
+      text = "(No response received)";
+    }
 
-    es.onerror = err => {
-      es.close();
-      append("PROJECT_AVA","(stream error — fallback text may appear slower)");
-      sendBtn.disabled = false;
-    };
+    append("PROJECT_AVA", text);
 
-  } catch (err) {
+  } catch(err){
     console.error(err);
     append("PROJECT_AVA","Oops, something went wrong!");
+  } finally {
     sendBtn.disabled = false;
   }
 }
@@ -133,8 +103,8 @@ Respond like Project_AVA with logic and reasoning.
 sendBtn.onclick = sendMessage;
 inputEl.addEventListener("keydown", e => { if(e.key==="Enter") sendMessage(); });
 
-// greet
-append("PROJECT_AVA","Project_AVA V1.2 online. What do you want?");
+// initial greeting
+append("PROJECT_AVA","Project_AVA V1.2 online. Ask me anything.");
 </script>
 
 </body>
