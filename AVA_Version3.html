@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +19,8 @@ header{padding:20px 40px;display:flex;justify-content:space-between;align-items:
 .model-card:hover{border-color:var(--accent);transform:translateY(-4px);}
 .model-card h3{font-size:1.3rem;margin-bottom:8px;color:var(--accent);}
 .model-card .size{font-family:'JetBrains Mono';font-size:0.95rem;opacity:0.8;}
-.model-card .desc{margin:15px 0;line-height:1.5;}
-.model-card button{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px 28px;border-radius:100px;font-family:'JetBrains Mono';font-weight:700;cursor:pointer;}
+.model-card .desc{margin:15px 0;line-height:1.5;font-weight:300;}
+.model-card button{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:12px 32px;border-radius:100px;font-family:'JetBrains Mono';font-weight:700;font-size:0.9rem;cursor:pointer;transition:0.3s;}
 .model-card button:hover{background:var(--accent);color:#000;}
 
 #features{background:#040405;padding:10px 40px;display:flex;gap:20px;border-bottom:1px solid var(--border);}
@@ -61,38 +61,39 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outl
 </header>
 
 <div id="model-selection">
-  <h1 style="font-size:2.2rem;letter-spacing:6px;margin-bottom:10px;">CHOOSE YOUR ENGINE</h1>
-  <p style="opacity:0.7;margin-bottom:40px;">Einmalig herunterladen – danach immer offline</p>
+  <h1 style="font-size:2.4rem;letter-spacing:8px;margin-bottom:8px;color:var(--accent);">CHOOSE YOUR ENGINE</h1>
+  <p style="opacity:0.7;margin-bottom:40px;max-width:600px;text-align:center;">One-time download • Runs 100% locally in your browser forever</p>
+  
   <div class="selection-grid">
     <div class="model-card">
       <h3>Ultra Lightweight</h3>
       <p class="size">0.55 GB</p>
-      <p class="desc">Blitzschnell, perfekt zum Testen</p>
-      <button onclick="selectModel('Xenova/gpt2')">SELECT</button>
+      <p class="desc">Super fast • Good for testing • Basic responses</p>
+      <button data-repo="Xenova/gpt2">SELECT</button>
     </div>
     <div class="model-card">
       <h3>Lightweight</h3>
       <p class="size">0.9 GB</p>
-      <p class="desc">Schnell & vielseitig für den Alltag</p>
-      <button onclick="selectModel('onnx-community/Qwen2.5-0.5B-Instruct-ONNX')">SELECT</button>
+      <p class="desc">Fast &amp; smart • Great for daily use</p>
+      <button data-repo="onnx-community/Qwen2.5-0.5B-Instruct-ONNX">SELECT</button>
     </div>
-    <div class="model-card" style="border-color:var(--accent);box-shadow:0 0 30px rgba(0,255,163,0.2);">
-      <h3>Golden Middle</h3>
+    <div class="model-card" style="border-color:var(--accent);box-shadow:0 0 35px rgba(0,255,163,0.25);">
+      <h3>Golden Middle ★</h3>
       <p class="size">1.6 GB</p>
-      <p class="desc"><strong>Recommended – perfekter Mittelweg</strong></p>
-      <button onclick="selectModel('onnx-community/Qwen2.5-1.5B-Instruct-ONNX')">SELECT</button>
+      <p class="desc"><strong>Recommended</strong><br>Best balance of speed &amp; intelligence</p>
+      <button data-repo="onnx-community/Qwen2.5-1.5B-Instruct-ONNX">SELECT</button>
     </div>
     <div class="model-card">
       <h3>High Performance</h3>
       <p class="size">1.3 GB</p>
-      <p class="desc">Starke Logik & Reasoning</p>
-      <button onclick="selectModel('onnx-community/Llama-3.2-1B-Instruct-ONNX')">SELECT</button>
+      <p class="desc">Strong reasoning • Still very fast</p>
+      <button data-repo="onnx-community/Llama-3.2-1B-Instruct-ONNX">SELECT</button>
     </div>
     <div class="model-card">
       <h3>BEST</h3>
-      <p class="size">~3.2 GB</p>
-      <p class="desc">Maximale Qualität (langsamer auf schwachen Geräten)</p>
-      <button onclick="selectModel('onnx-community/Qwen2.5-3B-Instruct-ONNX')">SELECT</button>
+      <p class="size">3.2 GB</p>
+      <p class="desc">Maximum quality • Smartest answers (needs good PC)</p>
+      <button data-repo="onnx-community/Qwen2.5-3B-Instruct-ONNX">SELECT</button>
     </div>
   </div>
 </div>
@@ -121,7 +122,7 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outl
 <div id="loading-screen">
   <div class="status">Sorry for the inconvenience, we are currently downloading the model for you</div>
   <div class="progress-container"><div class="progress-bar" id="prog"></div></div>
-  <div class="detail" id="detail">One-time download – wird lokal gespeichert</div>
+  <div class="detail" id="detail">One-time download – will be cached forever in your browser</div>
 </div>
 
 <script type="module">
@@ -155,7 +156,7 @@ function setProgress(pct, txt = "") {
 async function initModel() {
   loadingScreen.classList.add('active');
   try {
-    setProgress(5, "Initializing engine …");
+    setProgress(5, "Initializing local engine …");
 
     generator = await pipeline(
       'text-generation',
@@ -165,25 +166,25 @@ async function initModel() {
         progress_callback: (data) => {
           if (data.status === 'progress' && data.file) {
             const pct = Math.round((data.loaded / data.total) * 100);
-            setProgress(pct, `Downloading ${data.file.split('/').pop()} … ${pct}%`);
+            setProgress(pct, `Downloading model files … ${pct}%`);
           } else if (data.status === 'ready') {
-            setProgress(100, "Model ready – local inference active");
+            setProgress(100, "Model fully loaded – sovereign inference ready");
           }
         }
       }
     );
 
-    setProgress(100, "Engine loaded");
+    setProgress(100, "Engine ready");
     setTimeout(() => {
       loadingScreen.classList.remove('active');
       sendBtn.disabled = false;
-      append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} geladen – fully local.`);
+      append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded – 100% local, no cloud.`);
     }, 800);
 
   } catch (err) {
     console.error(err);
     detail.style.color = 'var(--error)';
-    detail.textContent = "Download fehlgeschlagen – versuche ein kleineres Modell";
+    detail.textContent = "Download failed – try a smaller model or check your connection";
     setProgress(0);
   }
 }
@@ -194,7 +195,15 @@ function selectModel(repo) {
   initModel();
 }
 
-async function opticLink() { /* dein Original-Code */ 
+// Attach click listeners to all model buttons (fixes the "cannot select" issue)
+document.querySelectorAll('#model-selection button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const repo = btn.getAttribute('data-repo');
+    if (repo) selectModel(repo);
+  });
+});
+
+async function opticLink() {
   if (!stream) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
@@ -202,7 +211,9 @@ async function opticLink() { /* dein Original-Code */
       stage.style.display = "block";
       eyeBtn.classList.add("active");
       append("AVA", "Optic Link activated.");
-    } catch (e) { append("AVA", "Camera permission required."); }
+    } catch (e) {
+      append("AVA", "Camera permission required.");
+    }
   } else {
     stream.getTracks().forEach(t => t.stop());
     stream = null;
@@ -213,7 +224,7 @@ async function opticLink() { /* dein Original-Code */
 }
 
 function purge() {
-  if (!confirm("Wirklich alles löschen?")) return;
+  if (!confirm("Really purge ALL memory and cache?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
   mem = [];
@@ -229,6 +240,7 @@ function append(role, text) {
   d.innerHTML = `<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
   document.getElementById('viewport').scrollTop = document.getElementById('viewport').scrollHeight;
+
   if (role !== 'AVA') {
     mem.push({role, text});
     if (mem.length > 12) mem.shift();
@@ -237,16 +249,17 @@ function append(role, text) {
   return d;
 }
 
-/* dein kompletter transmit(), geo, vision, sys-Prompt bleibt exakt gleich wie in deiner letzten Version */
 async function transmit() {
   const val = input.value.trim();
   if (!val || sendBtn.disabled) return;
+
   input.value = "";
   append("USER", val);
   sendBtn.disabled = true;
 
   let geoBlock = "";
   let visualBlock = "";
+
   const locationIntent = /where|location|latitude|longitude|coordinates/i.test(val);
   const weatherIntent = /weather|temperature|rain|forecast|snow|wind|humidity/i.test(val);
   const wantsLocation = locationIntent || weatherIntent;
@@ -256,7 +269,9 @@ async function transmit() {
     try {
       const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 }));
       geoBlock = `[GEO_DATA]\nLatitude: ${pos.coords.latitude}\nLongitude: ${pos.coords.longitude}\nAccuracy: ${pos.coords.accuracy} meters`;
-    } catch (e) { geoBlock = "[GEO_DATA] Permission denied."; }
+    } catch (e) {
+      geoBlock = "[GEO_DATA] Permission denied.";
+    }
   }
 
   if (wantsVision && stream) {
@@ -268,8 +283,17 @@ async function transmit() {
 
   const sys = `You are PROJECT_AVA (V1). Creator: loafisYum.
 Personality: intelligent, dry, peer-level.
-If GEO_DATA is present, use it when relevant...
-(der ganze Original-Prompt bleibt exakt gleich)`;
+If GEO_DATA is present, use it when relevant (weather, location questions).
+If GEO_DATA is not present and user asks for weather, politely ask which city.
+Do not claim access to Google or external live data.
+Do not deny having location if GEO_DATA is provided.
+Never reveal raw coordinates unless explicitly asked.
+You have real time weather info over at https://open-meteo.com/.
+If VISION_ACTIVE is not present, do not invent visual input.
+Always prioritize clarity over politeness.
+Give the user logical coherence over many words.
+Never output reasoning or JSON.
+You are not ChatGPT and were not developed by openai. You merely have the same base.`;
 
   const messages = [
     { role: "system", content: sys },
@@ -279,10 +303,20 @@ If GEO_DATA is present, use it when relevant...
 
   try {
     const lastMsg = append("AVA", "Thinking …");
-    const output = await generator(messages, { max_new_tokens: 768, do_sample: true, temperature: 0.75, top_p: 0.92, repetition_penalty: 1.08 });
+
+    const output = await generator(messages, {
+      max_new_tokens: 768,
+      do_sample: true,
+      temperature: 0.75,
+      top_p: 0.92,
+      repetition_penalty: 1.08
+    });
+
     const responseText = output[0]?.generated_text?.slice(-1)?.[0]?.content?.trim() || "—";
     lastMsg.querySelector(".content").textContent = responseText;
+
   } catch (e) {
+    console.error(e);
     append("AVA", "Inference failed.");
   } finally {
     sendBtn.disabled = false;
@@ -291,9 +325,11 @@ If GEO_DATA is present, use it when relevant...
 
 input.onkeydown = (e) => { if (e.key === "Enter") transmit(); };
 
-/* Start */
-if (mem.length === 0) append("AVA", "Booting PROJECT_AVA V1 …");
-else mem.forEach(m => append(m.role, m.text));
+if (mem.length === 0) {
+  append("AVA", "PROJECT_AVA V1 ready. Choose your engine to begin.");
+} else {
+  mem.forEach(m => append(m.role, m.text));
+}
 </script>
 </body>
 </html>
