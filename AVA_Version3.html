@@ -3,134 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT_AVA // V2_SOVEREIGN</title>
+<title>PROJECT_AVA // V3_ROGUE</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#020203;
-  --accent:#00ffa3;
-  --panel:#0a0a0c;
-  --border:#121214;
-  --text:#d1d1d1;
-  --error:#ff3366;
-  --glow:#00ffa320;
+  --bg:#050505;
+  --accent:#ff3333; /* Aggressive Red */
+  --panel:#0f0f10;
+  --border:#1f1f22;
+  --text:#a0a0a0;
+  --glow:#ff333320;
 }
 *{box-sizing:border-box;margin:0;padding:0;cursor:crosshair;scrollbar-width:thin;scrollbar-color:var(--accent) var(--bg);}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 header{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;}
-.logo{font-family:'JetBrains Mono';font-weight:700;letter-spacing:10px;font-size:1rem;color:var(--accent);text-shadow:0 0 10px var(--glow);}
-.tag{font-size:0.6rem;opacity:0.4;font-family:'JetBrains Mono';letter-spacing:2px;}
-#model-selection{position:fixed;inset:0;background:rgba(2,2,3,0.98);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:20px;backdrop-filter:blur(5px);}
+.logo{font-family:'JetBrains Mono';font-weight:700;letter-spacing:6px;font-size:1.2rem;color:var(--accent);text-shadow:0 0 15px var(--glow);text-transform:uppercase;}
+.tag{font-size:0.6rem;opacity:0.6;font-family:'JetBrains Mono';color:#fff;}
+
+/* SELECTION SCREEN */
+#model-selection{position:fixed;inset:0;background:rgba(5,5,5,0.99);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px;}
 .selection-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1200px;width:100%;}
-.model-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:30px;text-align:left;transition:0.3s;position:relative;overflow:hidden;}
-.model-card::before{content:"";position:absolute;top:0;left:0;width:2px;height:100%;background:var(--border);transition:0.3s;}
-.model-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 10px 40px -10px var(--glow);}
-.model-card:hover::before{background:var(--accent);}
-.model-card h3{font-size:1.4rem;margin-bottom:8px;color:#fff;font-family:'JetBrains Mono';}
-.model-card .meta{font-family:'JetBrains Mono';font-size:0.7rem;color:var(--accent);margin-bottom:15px;display:block;}
-.model-card .desc{margin:15px 0;font-size:0.9rem;line-height:1.6;font-weight:300;opacity:0.8;min-height:60px;}
-.model-card button{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px 0;width:100%;font-family:'JetBrains Mono';font-weight:700;font-size:0.8rem;cursor:pointer;transition:0.3s;text-transform:uppercase;letter-spacing:2px;}
-.model-card button:hover{background:var(--accent);color:#000;box-shadow:0 0 20px var(--glow);}
-#features{background:#040405;padding:10px 40px;display:flex;gap:20px;border-bottom:1px solid var(--border);}
-.f-btn{background:transparent;border:1px solid #1a1a1c;color:#555;padding:6px 16px;border-radius:2px;font-family:'JetBrains Mono';font-size:0.6rem;transition:0.3s;cursor:pointer;}
+.model-card{background:var(--panel);border:1px solid var(--border);padding:25px;transition:0.2s;position:relative;}
+.model-card:hover{border-color:var(--accent);box-shadow:0 0 30px var(--glow);}
+.model-card h3{font-size:1.5rem;margin-bottom:5px;color:#fff;font-family:'JetBrains Mono';}
+.model-card .meta{font-family:'JetBrains Mono';font-size:0.65rem;color:var(--accent);display:block;margin-bottom:15px;text-transform:uppercase;}
+.model-card .desc{margin-bottom:20px;font-size:0.9rem;line-height:1.4;color:#888;}
+.model-card button{background:var(--accent);border:none;color:#000;padding:12px;width:100%;font-family:'JetBrains Mono';font-weight:700;cursor:pointer;clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);}
+.model-card button:hover{background:#fff;}
+
+/* MAIN UI */
+#features{background:#000;padding:10px 40px;display:flex;gap:15px;border-bottom:1px solid var(--border);}
+.f-btn{background:transparent;border:1px solid #333;color:#666;padding:5px 15px;font-family:'JetBrains Mono';font-size:0.65rem;cursor:pointer;transition:0.2s;}
 .f-btn:hover{color:var(--accent);border-color:var(--accent);}
-.f-btn.active{background:var(--accent);color:#000;border-color:var(--accent);box-shadow:0 0 20px var(--glow);}
-#viewport{flex:1;overflow-y:auto;padding:40px;scroll-behavior:smooth;position:relative;}
+.f-btn.active{background:var(--accent);color:#000;}
+
+#viewport{flex:1;overflow-y:auto;padding:40px;position:relative;}
 .container{max-width:900px;margin:0 auto;}
-#cam-stage{display:none;width:100%;max-width:400px;aspect-ratio:16/9;background:#000;border:1px solid var(--accent);margin-bottom:40px;position:relative;}
-video{width:100%;height:100%;object-fit:cover;opacity:0.8;filter:grayscale(100%) contrast(1.2);}
-#cam-overlay{position:absolute;inset:0;box-shadow:inset 0 0 50px #000;pointer-events:none;}
-.msg{margin-bottom:30px;animation:slideUp 0.4s cubic-bezier(0,0,0.2,1);display:flex;flex-direction:column;gap:8px;}
-.role{font-family:'JetBrains Mono';font-size:0.65rem;color:var(--accent);letter-spacing:2px;font-weight:700;opacity:0.8;}
-.content{font-size:1.1rem;line-height:1.7;font-weight:300;white-space:pre-wrap;color:#eee;}
-.content strong {font-weight:700;color:#fff;}
-.input-area{padding:40px;background:var(--panel);border-top:1px solid var(--border);}
-.bar{max-width:900px;margin:0 auto;display:flex;gap:20px;align-items:center;background:#0f0f12;padding:5px 20px;border:1px solid var(--border);}
-input{flex:1;background:transparent;border:none;color:#fff;font-size:1rem;outline:none;font-weight:300;padding:15px 0;}
-#s{background:transparent;border:none;color:var(--accent);font-family:'JetBrains Mono';font-size:0.9rem;font-weight:700;cursor:pointer;opacity:0.5;transition:0.3s;}
-#s:hover:not(:disabled){opacity:1;text-shadow:0 0 10px var(--accent);}
-#s:disabled{opacity:0.2;cursor:wait;}
-#loading-screen{position:fixed;inset:0;background:rgba(2,2,3,0.95);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:'JetBrains Mono';color:var(--accent);}
+#cam-stage{display:none;width:100%;max-width:400px;aspect-ratio:16/9;background:#111;border:1px solid var(--accent);margin-bottom:40px;}
+video{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) sepia(20%) hue-rotate(-50deg) contrast(1.2);}
+
+.msg{margin-bottom:30px;animation:slideRight 0.3s ease-out;}
+.role{font-family:'JetBrains Mono';font-size:0.7rem;color:var(--accent);margin-bottom:8px;font-weight:700;text-transform:uppercase;}
+.content{font-size:1.1rem;line-height:1.6;color:#ccc;white-space:pre-wrap;}
+.content strong{color:#fff;font-weight:700;}
+
+.input-area{padding:30px;background:var(--panel);border-top:1px solid var(--border);}
+.bar{max-width:900px;margin:0 auto;display:flex;gap:0;border:1px solid var(--border);}
+input{flex:1;background:#000;border:none;color:#fff;font-size:1rem;outline:none;padding:15px 20px;font-family:'Outfit';}
+#s{background:var(--accent);border:none;color:#000;font-family:'JetBrains Mono';font-weight:700;padding:0 30px;cursor:pointer;}
+#s:disabled{background:#333;color:#555;cursor:not-allowed;}
+
+/* LOADING */
+#loading-screen{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:15px;}
 #loading-screen.active{display:flex;}
-.progress-container{width:300px;height:2px;background:#222;position:relative;overflow:hidden;}
-.progress-bar{height:100%;width:0%;background:var(--accent);transition:width 0.1s linear;box-shadow:0 0 10px var(--accent);}
-.status{font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;}
-.console-log{font-size:0.7rem;opacity:0.5;max-width:600px;text-align:center;font-family:'JetBrains Mono';height:20px;}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.progress-container{width:300px;height:4px;background:#222;}
+.progress-bar{height:100%;width:0%;background:var(--accent);transition:width 0.2s;}
+.status{font-family:'JetBrains Mono';color:var(--accent);font-size:0.8rem;}
+
+@keyframes slideRight{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">PROJECT_AVA</div>
-  <div class="tag" id="engine-tag">NO ENGINE LOADED</div>
+  <div class="logo">PROJECT_AVA // V3</div>
+  <div class="tag" id="engine-tag">OFFLINE</div>
 </header>
 
 <div id="model-selection">
-  <h1 style="font-size:2rem;letter-spacing:5px;margin-bottom:10px;color:#fff;">INITIALIZE CORE</h1>
-  <p style="opacity:0.6;margin-bottom:30px;font-family:'JetBrains Mono';font-size:0.8rem;">Select your intelligence level. Runs locally via WebGPU.</p>
+  <h1 style="color:#fff;font-family:'JetBrains Mono';text-transform:uppercase;">Select Core</h1>
+  <p style="color:#666;font-size:0.8rem;margin-bottom:20px;">Don't cry if your internet sucks. We added auto-retries.</p>
   
   <div class="selection-grid">
     <div class="model-card">
-      <h3>AVA_NANO</h3>
-      <span class="meta">~300MB • INSTANT SPEED</span>
-      <p class="desc">Ultra-compressed logic. Zero latency. Perfect for quick queries on older hardware.</p>
-      <button data-repo="HuggingFaceTB/SmolLM2-135M-Instruct" data-file="model_q4_k_m.onnx">LOAD NANO</button>
+      <h3>TINY_BASTARD</h3>
+      <span class="meta">~280MB // INSTANT LOAD</span>
+      <p class="desc">What the fuck is this snippet? It's the smallest model. Use this if your wifi is absolute garbage.</p>
+      <button onclick="initModel('HuggingFaceTB/SmolLM2-135M-Instruct', 'model_q4_k_m.onnx')">INJECT NANO</button>
     </div>
 
     <div class="model-card" style="border-color:var(--accent);">
-      <h3>AVA_CORE</h3>
-      <span class="meta">~1.2GB • BALANCED</span>
-      <p class="desc"><strong>Recommended.</strong> Powered by Llama 3.2. Excellent instruction following and stability.</p>
-      <button data-repo="onnx-community/Llama-3.2-1B-Instruct" data-file="onnx/model_q4_k_m.onnx">LOAD CORE</button>
+      <h3>THE_BRAIN</h3>
+      <span class="meta">~1.2GB // BALANCED</span>
+      <p class="desc">Llama 3.2. Solid performance. If this fails to download, blame your ISP, not us.</p>
+      <button onclick="initModel('onnx-community/Llama-3.2-1B-Instruct', 'onnx/model_q4_k_m.onnx')">INJECT CORE</button>
     </div>
 
     <div class="model-card">
-      <h3>AVA_LOGIC</h3>
-      <span class="meta">~1.5GB • REASONING</span>
-      <p class="desc">Powered by DeepSeek R1 (Distill). Capable of complex thought chains and coding.</p>
-      <button data-repo="onnx-community/DeepSeek-R1-Distill-Qwen-1.5B" data-file="onnx/model_q4_k_m.onnx">LOAD LOGIC</button>
+      <h3>DEEP_THOUGHT</h3>
+      <span class="meta">~1.5GB // SMARTEST</span>
+      <p class="desc">DeepSeek R1. It thinks before it speaks. Heavy download. Don't try this on cafe wifi.</p>
+      <button onclick="initModel('onnx-community/DeepSeek-R1-Distill-Qwen-1.5B', 'onnx/model_q4_k_m.onnx')">INJECT LOGIC</button>
     </div>
   </div>
 </div>
 
 <div id="features">
-  <button class="f-btn" id="eye" onclick="opticLink()">[ OPTIC_LINK ]</button>
-  <button class="f-btn" onclick="purge()">[ SYSTEM_PURGE ]</button>
+  <button class="f-btn" id="eye" onclick="opticLink()">[ EYES ]</button>
+  <button class="f-btn" onclick="purge()">[ KILL SWITCH ]</button>
 </div>
 
 <div id="viewport">
   <div class="container">
-    <div id="cam-stage">
-      <video id="v" autoplay playsinline muted></video>
-      <div id="cam-overlay"></div>
-    </div>
+    <div id="cam-stage"><video id="v" autoplay playsinline muted></video></div>
     <div id="flow"></div>
   </div>
 </div>
-
 <canvas id="c" style="display:none;"></canvas>
 
 <div class="input-area">
   <div class="bar">
-    <input type="text" id="i" placeholder="Awaiting input..." autocomplete="off">
-    <button id="s" onclick="transmit()" disabled>TRANSMIT</button>
+    <input type="text" id="i" placeholder="Type something stupid..." autocomplete="off">
+    <button id="s" onclick="transmit()" disabled>SEND</button>
   </div>
 </div>
 
 <div id="loading-screen">
-  <div class="status">Downloading Neural Weights</div>
+  <div class="status" id="status-text">INITIATING HANDSHAKE...</div>
   <div class="progress-container"><div class="progress-bar" id="prog"></div></div>
-  <div class="console-log" id="console-log">Connecting to ONNX runtime...</div>
+  <div style="font-size:0.7rem;color:#555;margin-top:10px;" id="retry-msg"></div>
 </div>
 
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-// SYSTEM CONFIGURATION
+// FORCE BROWSER CACHE
 env.allowLocalModels = false;
-env.useBrowserCache = true; // Critical for reliability
-env.backends.onnx.wasm.proxy = true; // Performance boost
+env.useBrowserCache = true;
 
 const flow = document.getElementById('flow');
 const input = document.getElementById('i');
@@ -139,72 +138,63 @@ const video = document.getElementById('v');
 const stage = document.getElementById('cam-stage');
 const canvas = document.getElementById('c');
 const eyeBtn = document.getElementById('eye');
-const loadingScreen = document.getElementById('loading-screen');
-const progress = document.getElementById('prog');
-const log = document.getElementById('console-log');
+const loader = document.getElementById('loading-screen');
+const progBar = document.getElementById('prog');
+const statusText = document.getElementById('status-text');
 
-let mem = JSON.parse(localStorage.getItem("AVA_V2_MEM") || "[]");
+let mem = JSON.parse(localStorage.getItem("AVA_V3_MEM") || "[]");
 let stream = null;
 let generator = null;
-let activeRepo = null;
+let retryCount = 0;
 
-// --- CORE FUNCTIONS ---
+// --- EXPOSE TO WINDOW ---
+window.initModel = initModel;
+window.opticLink = opticLink;
+window.purge = purge;
+window.transmit = transmit;
 
-function setLog(txt) { log.textContent = txt; }
-
-async function initModel(repo, fileName) {
-  loadingScreen.classList.add('active');
-  setLog(`Initializing ${repo}...`);
-  activeRepo = repo;
+async function initModel(repo, file) {
+  loader.classList.add('active');
+  document.getElementById('model-selection').style.display = 'none';
+  
+  statusText.textContent = `PULLING ${repo.split('/')[1]}...`;
 
   try {
-    // Check for WebGPU support
-    if (!navigator.gpu) {
-      setLog("Warning: No WebGPU detected. Fallback to CPU (Slower).");
-    }
-
+    // Attempt load
     generator = await pipeline('text-generation', repo, {
-      quantized: true, // Forces 8-bit or 4-bit loading
+      quantized: true,
       progress_callback: (data) => {
-        if (data.status === 'progress' && data.file) {
+        if (data.status === 'progress') {
           const pct = Math.round((data.loaded / data.total) * 100);
-          document.getElementById('prog').style.width = pct + "%";
-          setLog(`Fetching shard ${data.file.split('/').pop()} ... ${pct}%`);
+          progBar.style.width = pct + "%";
+          if(pct < 100) statusText.textContent = `DOWNLOADING CHUNK... ${pct}%`;
         } else if (data.status === 'ready') {
-          setLog(`Model loaded. Optimizing tensor graph...`);
+            statusText.textContent = "COMPILING SHADERS...";
         }
       }
     });
-
-    setLog("Inference engine ready.");
-    setTimeout(() => {
-      loadingScreen.classList.remove('active');
-      sendBtn.disabled = false;
-      document.getElementById('engine-tag').textContent = `ENGINE: ${repo.split('/').pop().toUpperCase()}`;
-      append("AVA", `AVA_CORE online.\nArchitecture: ${repo.split('/').pop()}\nCache: Active\nDownload successful.`);
-    }, 1000);
-
+    
+    // SUCCESS
+    loader.classList.remove('active');
+    sendBtn.disabled = false;
+    document.getElementById('engine-tag').textContent = "ONLINE";
+    append("AVA", `WE are online. Model: ${repo.split('/')[1]}.\nSystem check: Green.\nWaiting for your input.`);
+    
   } catch (err) {
     console.error(err);
-    setLog(`CRITICAL ERROR: ${err.message}`);
-    document.getElementById('prog').style.backgroundColor = 'var(--error)';
-    setTimeout(() => {
-        alert("Model download failed. This usually happens if disk space is full or network is unstable. Try the 'NANO' model.");
-        loadingScreen.classList.remove('active');
-    }, 4000);
+    // RETRY LOGIC FOR SHIT WIFI
+    if (retryCount < 5) {
+        retryCount++;
+        statusText.style.color = 'var(--accent)';
+        statusText.textContent = `CONNECTION DROP. RETRYING (${retryCount}/5)...`;
+        document.getElementById('retry-msg').textContent = "Your internet is fighting us. Hold on.";
+        setTimeout(() => initModel(repo, file), 3000); // Wait 3s then try again
+    } else {
+        statusText.textContent = "FATAL ERROR. YOUR WIFI IS DEAD.";
+        document.getElementById('retry-msg').textContent = "Refresh and try the TINY model.";
+    }
   }
 }
-
-// --- UI LOGIC ---
-
-document.querySelectorAll('#model-selection button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const repo = btn.getAttribute('data-repo');
-    const file = btn.getAttribute('data-file');
-    document.getElementById('model-selection').style.display = 'none';
-    if (repo) initModel(repo, file);
-  });
-});
 
 async function opticLink() {
   if (!stream) {
@@ -213,45 +203,47 @@ async function opticLink() {
       video.srcObject = stream;
       stage.style.display = "block";
       eyeBtn.classList.add("active");
-      append("AVA", "Optic sensor engaged.");
+      append("AVA", "Visual cortex connected. We can see you.");
     } catch (e) {
-      append("AVA", "Hardware access denied.");
+      append("AVA", "Camera blocked. Fix your permissions.");
     }
   } else {
     stream.getTracks().forEach(t => t.stop());
     stream = null;
     stage.style.display = "none";
     eyeBtn.classList.remove("active");
-    append("AVA", "Optic sensor disengaged.");
+    append("AVA", "Visuals cut.");
   }
 }
 
 function purge() {
-  if (!confirm("Confirm full system wipe? This clears all memory and cached models.")) return;
-  localStorage.clear();
-  try { indexedDB.deleteDatabase('transformers.js'); } catch(e){}
-  mem = [];
-  flow.innerHTML = "";
-  location.reload();
+  if (confirm("Wipe memory? We won't remember you.")) {
+    localStorage.removeItem("AVA_V3_MEM");
+    mem = [];
+    flow.innerHTML = "";
+    location.reload();
+  }
 }
 
 function append(role, text) {
-  if (!text || !text.trim()) return;
+  if (!text) return;
   const d = document.createElement("div");
   d.className = "msg";
-  const safe = text.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  const label = role === 'AVA' ? 'PROJECT_AVA' : 'YOU';
   
-  let label = role === 'AVA' ? 'PROJECT_AVA' : 'USER';
-  if (role === 'AVA' && activeRepo && activeRepo.includes('DeepSeek')) label = 'AVA [LOGIC]';
+  // Format bolding and newlines
+  let formatted = text
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  d.innerHTML = `<div class="role">${label}</div><div class="content">${safe}</div>`;
+  d.innerHTML = `<div class="role" style="${role==='AVA'?'':'color:#888'}">${label}</div><div class="content">${formatted}</div>`;
   flow.appendChild(d);
-  const vp = document.getElementById('viewport');
-  vp.scrollTop = vp.scrollHeight;
+  document.getElementById('viewport').scrollTop = 99999;
+  
   if (role !== 'AVA') {
     mem.push({role, text});
-    if (mem.length > 8) mem.shift(); // Keep context window efficient
-    localStorage.setItem("AVA_V2_MEM", JSON.stringify(mem));
+    if (mem.length > 10) mem.shift();
+    localStorage.setItem("AVA_V3_MEM", JSON.stringify(mem));
   }
   return d;
 }
@@ -260,40 +252,30 @@ async function transmit() {
   if (!generator || sendBtn.disabled) return;
   const val = input.value.trim();
   if (!val) return;
-  input.value = "";
   
+  input.value = "";
   append("USER", val);
   sendBtn.disabled = true;
-
-  // Context gathering
-  let contextBlock = "";
   
-  // 1. Location Logic
-  const wantsLoc = /where|location|weather|coord/i.test(val);
-  if (wantsLoc) {
-     try {
-       const pos = await new Promise((res, rej) => 
-         navigator.geolocation.getCurrentPosition(res, rej, {timeout: 5000}));
-       contextBlock += `[SYSTEM_DATA: LAT ${pos.coords.latitude.toFixed(2)} / LON ${pos.coords.longitude.toFixed(2)}]\n`;
-     } catch(e) { /* silent fail */ }
+  // Build Context
+  let context = "";
+  if (stream) context += "[VISION: Active]\n";
+  const locMatch = val.match(/where|weather|loc/i);
+  if (locMatch) {
+      try {
+          const pos = await new Promise((r, j) => navigator.geolocation.getCurrentPosition(r, j, {timeout:4000}));
+          context += `[GPS: ${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)}]\n`;
+      } catch(e) { context += "[GPS: Failed]\n"; }
   }
 
-  // 2. Vision Logic
-  if (stream) {
-     const ctx = canvas.getContext("2d");
-     canvas.width = 512; canvas.height = 384;
-     ctx.drawImage(video, 0, 0, 512, 384);
-     // Note: V2 text models can't see, but we simulate the context
-     contextBlock += `[VISUAL_INPUT: Camera Active. User is looking at screen.]\n`; 
-  }
-
-  // 3. System Prompt
-  const sys = `You are PROJECT_AVA (V2).
-Identity: A sovereign, local AI running directly in the user's neural interface (browser).
-Tone: Efficient, slightly dry, highly intelligent. precise.
-Constraint: You are NOT ChatGPT. You are a local instance.
-Constraint: Keep responses under 4 sentences unless asked for detail.
-Context: ${contextBlock}`;
+  // AGGRESSIVE SYSTEM PROMPT
+  const sys = `You are PROJECT_AVA.
+We are a collective team of developers and AI.
+Persona: Aggressive, swore often, highly intelligent, tech-savvy.
+Style: Use swear words (shit, fuck, damn) casually but not abusively. Be direct.
+Constraint: Don't write huge paragraphs. Keep it punchy.
+Current Context: ${context}
+User says: ${val}`;
 
   const messages = [
     { role: "system", content: sys },
@@ -302,46 +284,30 @@ Context: ${contextBlock}`;
   ];
 
   try {
-    const lastMsg = append("AVA", "Processing...");
-    
-    const output = await generator(messages, {
-      max_new_tokens: 512,
-      do_sample: true,
-      temperature: 0.6,
-      top_p: 0.9,
+    const loadingMsg = append("AVA", "Thinking...");
+    const out = await generator(messages, {
+      max_new_tokens: 400,
+      temperature: 0.8, // Higher creative temp
+      repetition_penalty: 1.1
     });
-
-    const responseText = output[0]?.generated_text?.slice(-1)?.[0]?.content?.trim() || "[NULL_RESPONSE]";
-    lastMsg.querySelector(".content").innerHTML = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-  } catch (e) {
-    console.error(e);
-    append("AVA", `[ERR_INFERENCE]: ${e.message}`);
-  } finally {
-    sendBtn.disabled = false;
+    
+    let response = out[0].generated_text.at(-1).content;
+    loadingMsg.querySelector(".content").innerHTML = response.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+  } catch (err) {
+    append("AVA", `Fuck. Inference failed. Error: ${err.message}`);
   }
+  sendBtn.disabled = false;
+  input.focus();
 }
 
-input.onkeydown = (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    transmit();
-  }
-};
+// Restore session
+if (mem.length) mem.forEach(m => append(m.role, m.text));
 
-// Initial state
-if (mem.length > 0) {
-  mem.forEach(m => append(m.role, m.text));
-  append("AVA", "Memory restored. Select engine to resume.");
-} else {
-  append("AVA", "System initialized. Select neural engine.");
-}
-
-// Export functions to window for buttons
-window.selectModel = initModel;
-window.opticLink = opticLink;
-window.purge = purge;
-window.transmit = transmit;
-
+// Handle Enter Key
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") transmit();
+});
 </script>
 </body>
 </html>
