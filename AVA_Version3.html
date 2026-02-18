@@ -145,6 +145,7 @@ header{
   cursor:pointer;
 }
 .f-btn:hover{color:var(--accent);border-color:var(--accent);}
+.f-btn.active{color:var(--accent);border-color:var(--accent);box-shadow:0 0 10px var(--glow);}
 
 #viewport{
   flex:1 1 auto;
@@ -355,7 +356,7 @@ input{
 
 <div id="loading-screen">
   <div class="loading-glow"></div>
-  <div class="status">Sorry for the inconvenience, we are currently downloading the model for you</div>
+  <div class="status">Downloading sovereign core</div>
   <div class="progress-container"><div class="progress-bar" id="prog"></div></div>
   <div class="detail" id="detail">One-time download. Everything stays on your device.</div>
 </div>
@@ -388,6 +389,13 @@ function setProgress(pct, txt = "") {
   if (txt) detail.textContent = txt;
 }
 
+// Fixed: Global scope exposure for HTML buttons
+window.selectModel = (repo) => {
+  chosenRepo = repo;
+  document.getElementById('model-selection').style.display = 'none';
+  initModel();
+};
+
 async function initModel() {
   loadingScreen.classList.add('active');
   setProgress(5, "Initializing sovereign core…");
@@ -398,31 +406,25 @@ async function initModel() {
         if (data.status === 'progress' && data.file) {
           const pct = Math.round((data.loaded / data.total) * 100);
           setProgress(pct, `Downloading ${data.file.split('/').pop()} … ${pct}%`);
-        } else if (data.status === 'ready') {
-          setProgress(100, "Core loaded – fully sovereign");
         }
       }
     });
-    setProgress(100, "Ready");
+    setProgress(100, "Core active.");
     setTimeout(() => {
       loadingScreen.classList.remove('active');
       sendBtn.disabled = false;
-      append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
+      if (mem.length === 0) {
+          append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
+      }
     }, 900);
   } catch (err) {
+    console.error(err);
     detail.style.color = 'var(--error)';
-    detail.textContent = "Failed. Try a smaller core.";
-    setProgress(0);
+    detail.textContent = "Initialization failed. Try a smaller core.";
   }
 }
 
-function selectModel(repo) {
-  chosenRepo = repo;
-  document.getElementById('model-selection').style.display = 'none';
-  initModel();
-}
-
-async function opticLink() {
+window.opticLink = async () => {
   if (!stream) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
@@ -431,7 +433,7 @@ async function opticLink() {
       eyeBtn.classList.add("active");
       append("AVA", "Optic Link activated.");
     } catch (e) {
-      append("AVA", "Camera permission required.");
+      append("AVA", "Camera permission denied.");
     }
   } else {
     stream.getTracks().forEach(t => t.stop());
@@ -440,16 +442,16 @@ async function opticLink() {
     eyeBtn.classList.remove("active");
     append("AVA", "Optic Link deactivated.");
   }
-}
+};
 
-function purge() {
+window.purge = () => {
   if (!confirm("PURGE ALL MEMORY AND CACHE?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
   mem = [];
   flow.innerHTML = "";
   location.reload();
-}
+};
 
 function append(role, text) {
   if (!text || !text.trim()) return;
@@ -458,79 +460,80 @@ function append(role, text) {
   const safe = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   d.innerHTML = `<div class="role">${role === 'AVA' ? 'PROJECT_AVA' : 'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
-  requestAnimationFrame(() => {
-    const vp = document.getElementById('viewport');
-    vp.scrollTop = vp.scrollHeight;
-  });
-  if (role !== 'AVA') {
-    mem.push({ role, text });
-    if (mem.length > 12) mem.shift();
-    localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
-  }
+  
+  const vp = document.getElementById('viewport');
+  vp.scrollTop = vp.scrollHeight;
   return d;
 }
 
-async function transmit() {
+window.transmit = async () => {
   if (!generator || sendBtn.disabled) return;
   const val = input.value.trim();
   if (!val) return;
+  
   input.value = "";
   append("USER", val);
+  mem.push({ role: "USER", text: val }); // Save user input to history
+  
   sendBtn.disabled = true;
   let geo = "", vis = "";
-  if (/where|location|latitude|longitude|coordinates/i.test(val)) {
+  
+  if (/where|location|weather/i.test(val)) {
     try {
-      const pos = await new Promise((r, j) => navigator.geolocation.getCurrentPosition(r, j, { enableHighAccuracy: true, timeout: 8000 }));
-      geo = `[GEO_DATA]\nLatitude: ${pos.coords.latitude}\nLongitude: ${pos.coords.longitude}\nAccuracy: ${pos.coords.accuracy}m`;
-    } catch (e) { geo = "[GEO_DATA] Permission denied."; }
+      const pos = await new Promise((r, j) => navigator.geolocation.getCurrentPosition(r, j, { timeout: 5000 }));
+      geo = `[GEO_DATA] Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
+    } catch (e) { geo = "[GEO_DATA] Unavailable."; }
   }
-  if (/what (am i|do you) see|was (zeige ich|sehen sie)/i.test(val) && stream) {
-    const ctx = canvas.getContext("2d");
-    canvas.width = 512; canvas.height = 384;
-    ctx.drawImage(video, 0, 0, 512, 384);
-    vis = `[VISION_ACTIVE]\nUser camera frame captured.`;
+
+  if (/see|look|show/i.test(val) && stream) {
+    vis = `[VISION_ACTIVE] User camera frame captured. (Internal note: I am a text-only core; acknowledge attempt but explain I cannot see pixels yet).`;
   }
+
   const sys = `You are PROJECT_AVA (V1). Creator: loafisYum.
-Personality: intelligent, dry, peer-level.
-If GEO_DATA is present, use it when relevant (weather, location questions).
-If GEO_DATA is not present and user asks for weather, politely ask which city.
-Do not claim access to Google or external live data.
-Do not deny having location if GEO_DATA is provided.
-Never reveal raw coordinates unless explicitly asked.
-You have real time weather info over at https://open-meteo.com/.
-If VISION_ACTIVE is not present, do not invent visual input.
-Always prioritize clarity over politeness.
-Give the user logical coherence over many words.
-Never output reasoning or JSON.
-You are not ChatGPT and were not developed by openai. You merely have the same base.`;
+Personality: intelligent, dry, peer-level. You are a local AI, not ChatGPT.
+Use GEO_DATA if provided for location context. 
+Prioritize logic. Never output JSON or raw coordinates.`;
+
   const messages = [
     { role: "system", content: sys },
     ...mem.map(m => ({ role: m.role === "AVA" ? "assistant" : "user", content: m.text })),
-    { role: "user", content: (geo ? geo + "\n\n" : "") + (vis ? vis + "\n\n" : "") + val }
+    { role: "user", content: (geo ? geo + "\n" : "") + (vis ? vis + "\n" : "") + val }
   ];
+
   try {
     const last = append("AVA", "Thinking …");
-    const out = await generator(messages, { max_new_tokens: 768, do_sample: true, temperature: 0.75, top_p: 0.92, repetition_penalty: 1.08 });
-    let resp = "—";
-    if (out && out[0] && out[0].generated_text) {
-      const lastPart = out[0].generated_text[out[0].generated_text.length - 1];
-      resp = lastPart && lastPart.content ? lastPart.content.trim() : (typeof lastPart === "string" ? lastPart.trim() : "—");
-    }
+    
+    // Fixed: return_full_text: false ensures we only get the new reply
+    const out = await generator(messages, { 
+        max_new_tokens: 512, 
+        do_sample: true, 
+        temperature: 0.7,
+        return_full_text: false 
+    });
+
+    let resp = out[0].generated_text.trim();
     last.querySelector(".content").textContent = resp;
+    
+    // Commit to persistent memory
+    mem.push({ role: "AVA", text: resp });
+    if (mem.length > 15) mem.shift();
+    localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
+
   } catch (e) {
     console.error(e);
-    append("AVA", "Inference failed.");
+    append("AVA", "Inference error. Core might be overloaded.");
   } finally {
     sendBtn.disabled = false;
   }
-}
+};
 
-input.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); transmit(); } };
+input.onkeydown = e => { if (e.key === "Enter") transmit(); };
 
-if (mem.length === 0) {
-  append("AVA", "PROJECT_AVA V1 ready. Choose your core to begin.");
-} else {
+// Restore existing session
+if (mem.length > 0) {
   mem.forEach(m => append(m.role, m.text));
+} else {
+  append("AVA", "PROJECT_AVA V1 ready. Choose your core to begin.");
 }
 </script>
 </body>
