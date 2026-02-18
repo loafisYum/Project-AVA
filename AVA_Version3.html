@@ -138,13 +138,11 @@ async function transmit(){
     let geoBlock="";
     let visualBlock="";
 
-   const locationIntent = /where|location|latitude|longitude|coordinates/i.test(val);
-const weatherIntent = /weather|temperature|rain|forecast|snow|wind|humidity/i.test(val);
-
-const wantsLocation = locationIntent || weatherIntent;
+    const locationIntent = /where|location|latitude|longitude|coordinates/i.test(val);
+    const weatherIntent = /weather|temperature|rain|forecast|snow|wind|humidity/i.test(val);
+    const wantsLocation = locationIntent || weatherIntent;
     const wantsVision=/what am i showing|what do you see|was zeige ich|describe what you see/i.test(val);
 
-    // GEO nur wenn wirklich gefragt
     if(wantsLocation){
         try{
             const pos=await getLocation();
@@ -157,7 +155,6 @@ Accuracy: ${pos.coords.accuracy} meters`;
         }
     }
 
-    // VISUAL nur wenn wirklich gefragt UND camera aktiv
     if(wantsVision && stream){
         const ctx=canvas.getContext("2d");
         canvas.width=400;
@@ -170,10 +167,12 @@ User camera frame captured.`;
 
     const sys=`You are PROJECT_AVA (V1). Creator: loafisYum.
 Personality: intelligent, dry, peer-level.
+
+If GEO_DATA is present, use it when relevant (weather, location questions).
+If GEO_DATA is not present and user asks for weather, politely ask which city.
+Do not claim access to Google or external live data.
+Do not deny having location if GEO_DATA is provided.
 Never reveal raw coordinates unless explicitly asked.
-If GEO_DATA is not present, do not guess location. but use location.
-If user asks for weather, use google weather and input GEO_DATA there.
-You have access to users location and weather info, do not guess weather info. do not deny it.
 If VISION_ACTIVE is not present, do not invent visual input.
 Never output reasoning or JSON.
 You are not ChatGPT.`;
