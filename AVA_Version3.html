@@ -6,7 +6,15 @@
 <title>PROJECT_AVA // V1</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#020203; --accent:#00ffa3; --panel:#0a0a0c; --border:#121214; --text:#d1d1d1; --error:#ff3366; }
+:root {
+  --bg:#020203;
+  --accent:#00ffa3;
+  --panel:#0a0a0c;
+  --border:#121214;
+  --text:#d1d1d1;
+  --error:#ff3366;
+  --glow:#00ffa320;
+}
 *{box-sizing:border-box;margin:0;padding:0;cursor:crosshair;}
 body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 header{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--panel);border-bottom:1px solid var(--border);}
@@ -15,7 +23,7 @@ header{padding:20px 40px;display:flex;justify-content:space-between;align-items:
 #model-selection{position:fixed;inset:0;background:rgba(2,2,3,0.98);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:20px;}
 .selection-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1100px;width:100%;}
 .model-card{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:25px;text-align:center;transition:0.3s;}
-.model-card:hover{border-color:var(--accent);transform:translateY(-4px);}
+.model-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 0 30px var(--glow);}
 .model-card h3{font-size:1.3rem;margin-bottom:8px;color:var(--accent);}
 .model-card .size{font-family:'JetBrains Mono';font-size:0.95rem;opacity:0.8;}
 .model-card .desc{margin:15px 0;line-height:1.5;font-weight:300;}
@@ -38,49 +46,19 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outl
 #s{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px 30px;border-radius:100px;font-family:'JetBrains Mono';font-size:0.8rem;font-weight:700;transition:0.3s;cursor:pointer;}
 #s:hover:not(:disabled){background:var(--accent);color:#000;}
 #s:disabled{opacity:0.4;cursor:wait;}
-#loading-screen{position:fixed;inset:0;background:rgba(2,2,3,0.96);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:30px;font-family:'JetBrains Mono';color:var(--accent);}
+#loading-screen{position:fixed;inset:0;background:rgba(2,2,3,0.97);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:35px;font-family:'JetBrains Mono';color:var(--accent);overflow:hidden;}
 #loading-screen.active{display:flex;}
-.progress-container{width:60%;max-width:500px;height:12px;background:#111;border:1px solid #222;border-radius:6px;overflow:hidden;}
-.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#00ffa3,#00c896);transition:width 0.2s ease-out;}
-.status{font-size:1.1rem;letter-spacing:1px;}
-.detail{font-size:0.9rem;opacity:0.7;max-width:500px;text-align:center;line-height:1.5;}
-@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-header{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--panel);border-bottom:1px solid var(--border);}
-.logo{font-family:'JetBrains Mono';font-weight:700;letter-spacing:10px;font-size:1rem;color:var(--accent);}
-.tag{font-size:0.6rem;opacity:0.4;font-family:'JetBrains Mono';letter-spacing:2px;}
-#model-selection{position:fixed;inset:0;background:rgba(2,2,3,0.98);z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:20px;}
-.selection-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1100px;width:100%;}
-.model-card{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:25px;text-align:center;transition:0.3s;}
-.model-card:hover{border-color:var(--accent);transform:translateY(-4px);}
-.model-card h3{font-size:1.3rem;margin-bottom:8px;color:var(--accent);}
-.model-card .size{font-family:'JetBrains Mono';font-size:0.95rem;opacity:0.8;}
-.model-card .desc{margin:15px 0;line-height:1.5;font-weight:300;}
-.model-card button{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:12px 32px;border-radius:100px;font-family:'JetBrains Mono';font-weight:700;font-size:0.9rem;cursor:pointer;transition:0.3s;}
-.model-card button:hover{background:var(--accent);color:#000;}
-#features{background:#040405;padding:10px 40px;display:flex;gap:20px;border-bottom:1px solid var(--border);}
-.f-btn{background:transparent;border:1px solid #1a1a1c;color:#555;padding:6px 16px;border-radius:100px;font-family:'JetBrains Mono';font-size:0.6rem;transition:0.3s;cursor:pointer;}
-.f-btn:hover{color:var(--accent);border-color:var(--accent);}
-.f-btn.active{background:var(--accent);color:#000;border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,163,0.15);}
-#viewport{flex:1;overflow-y:auto;padding:40px;scroll-behavior:smooth;position:relative;}
-.container{max-width:800px;margin:0 auto;}
-#cam-stage{display:none;width:100%;aspect-ratio:16/9;background:#000;border-radius:15px;margin-bottom:40px;border:1px solid var(--border);overflow:hidden;}
-video{width:100%;height:100%;object-fit:cover;opacity:0.95;}
-.msg{margin-bottom:40px;animation:slideUp 0.5s cubic-bezier(0,0,0.2,1);}
-.role{font-family:'JetBrains Mono';font-size:0.65rem;color:var(--accent);margin-bottom:10px;letter-spacing:4px;font-weight:700;}
-.content{font-size:1.15rem;line-height:1.75;font-weight:300;white-space:pre-wrap;word-break:break-word;}
-.input-area{padding:40px;background:var(--panel);border-top:1px solid var(--border);}
-.bar{max-width:800px;margin:0 auto;display:flex;gap:25px;align-items:center;}
-input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outline:none;font-weight:300;}
-#s{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px 30px;border-radius:100px;font-family:'JetBrains Mono';font-size:0.8rem;font-weight:700;transition:0.3s;cursor:pointer;}
-#s:hover:not(:disabled){background:var(--accent);color:#000;}
-#s:disabled{opacity:0.4;cursor:wait;}
-#loading-screen{position:fixed;inset:0;background:rgba(2,2,3,0.96);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:30px;font-family:'JetBrains Mono';color:var(--accent);}
-#loading-screen.active{display:flex;}
-.progress-container{width:60%;max-width:500px;height:12px;background:#111;border:1px solid #222;border-radius:6px;overflow:hidden;}
-.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#00ffa3,#00c896);transition:width 0.2s ease-out;}
-.status{font-size:1.1rem;letter-spacing:1px;}
-.detail{font-size:0.9rem;opacity:0.7;max-width:500px;text-align:center;line-height:1.5;}
+#loading-screen::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,#00ffa310 0%,transparent 70%);animation:pulseBg 8s infinite linear;}
+.progress-container{width:62%;max-width:520px;height:14px;background:#111;border:1px solid #222;border-radius:8px;overflow:hidden;position:relative;box-shadow:0 0 15px var(--glow);}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#00ffa3,#00ffcc,#00ffa3);background-size:200% 100%;transition:width 0.25s linear;animation:shimmer 1.8s linear infinite;}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.status{font-size:1.15rem;letter-spacing:2px;position:relative;}
+.status::after{content:"...";animation:loadingDots 1.4s steps(4,end) infinite;}
+.detail{font-size:0.92rem;opacity:0.75;max-width:520px;text-align:center;line-height:1.6;}
+.loading-glow{position:absolute;width:280px;height:280px;background:radial-gradient(circle,#00ffa330 10%,transparent 70%);border-radius:50%;animation:loadingGlow 3s ease-in-out infinite alternate;}
+@keyframes loadingGlow{0%{transform:scale(0.8);opacity:0.4;}100%{transform:scale(1.15);opacity:0.7;}}
+@keyframes pulseBg{0%{opacity:0.6;}50%{opacity:1;}100%{opacity:0.6;}}
+@keyframes loadingDots{0%{content:".";}33%{content:"..";}66%{content:"...";}100%{content:"....";}}
 @keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
@@ -150,6 +128,7 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outl
 </div>
 
 <div id="loading-screen">
+  <div class="loading-glow"></div>
   <div class="status">Sorry for the inconvenience, we are currently downloading the model for you</div>
   <div class="progress-container"><div class="progress-bar" id="prog"></div></div>
   <div class="detail" id="detail">One-time download – will be cached forever in your browser</div>
@@ -174,6 +153,7 @@ let mem = JSON.parse(localStorage.getItem("AVA_V1_MEM") || "[]");
 let stream = null;
 let generator = null;
 let chosenRepo = null;
+let modelLoaded = false;
 function setProgress(pct, txt) {
   progress.style.width = pct + "%";
   if (txt) detail.textContent = txt;
@@ -193,6 +173,7 @@ async function initModel() {
         }
       }
     });
+    modelLoaded = true;
     setProgress(100, "Engine ready");
     setTimeout(() => {
       loadingScreen.classList.remove('active');
@@ -200,6 +181,7 @@ async function initModel() {
       append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded – 100% local, no cloud.`);
     }, 800);
   } catch (err) {
+    console.error(err);
     detail.style.color = 'var(--error)';
     detail.textContent = "Download failed – try a smaller model or check your connection";
     setProgress(0);
@@ -250,7 +232,8 @@ function append(role, text) {
   const safe = text.replace(/</g,"&lt;").replace(/>/g,"&gt;");
   d.innerHTML = `<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
-  document.getElementById('viewport').scrollTop = document.getElementById('viewport').scrollHeight;
+  const vp = document.getElementById('viewport');
+  vp.scrollTop = vp.scrollHeight;
   if (role !== 'AVA') {
     mem.push({role, text});
     if (mem.length > 12) mem.shift();
@@ -259,8 +242,9 @@ function append(role, text) {
   return d;
 }
 async function transmit() {
+  if (!modelLoaded || sendBtn.disabled) return;
   const val = input.value.trim();
-  if (!val || sendBtn.disabled) return;
+  if (!val) return;
   input.value = "";
   append("USER", val);
   sendBtn.disabled = true;
@@ -315,87 +299,18 @@ You are not ChatGPT and were not developed by openai. You merely have the same b
     const responseText = output[0]?.generated_text?.slice(-1)?.[0]?.content?.trim() || "—";
     lastMsg.querySelector(".content").textContent = responseText;
   } catch (e) {
+    console.error(e);
     append("AVA", "Inference failed.");
   } finally {
     sendBtn.disabled = false;
   }
 }
-input.onkeydown = (e) => { if (e.key === "Enter") transmit(); };
-function validateInputLength(val) {
-  return val.length > 0 && val.length < 501;
-}
-function sanitizeInput(val) {
-  return val.trim();
-}
-function updateMemory(newEntry) {
-  mem.push(newEntry);
-  if (mem.length > 12) mem.shift();
-  localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
-}
-function scrollViewport() {
-  const vp = document.getElementById('viewport');
-  vp.scrollTop = vp.scrollHeight;
-}
-function checkGeoPermission() {
-  return new Promise(resolve => {
-    navigator.geolocation.getCurrentPosition(() => resolve(true), () => resolve(false));
-  });
-}
-function captureVisionFrame() {
-  const ctx = canvas.getContext("2d");
-  canvas.width = 512;
-  canvas.height = 384;
-  ctx.drawImage(video, 0, 0, 512, 384);
-  return `[VISION_ACTIVE]\nUser camera frame captured.`;
-}
-function formatSystemPrompt() {
-  return `You are PROJECT_AVA (V1). Creator: loafisYum.
-Personality: intelligent, dry, peer-level.
-If GEO_DATA is present, use it when relevant (weather, location questions).
-If GEO_DATA is not present and user asks for weather, politely ask which city.
-Do not claim access to Google or external live data.
-Do not deny having location if GEO_DATA is provided.
-Never reveal raw coordinates unless explicitly asked.
-You have real time weather info over at https://open-meteo.com/.
-If VISION_ACTIVE is not present, do not invent visual input.
-Always prioritize clarity over politeness.
-Give the user logical coherence over many words.
-Never output reasoning or JSON.
-You are not ChatGPT and were not developed by openai. You merely have the same base.`;
-}
-function buildChatMessages(val, geo, vis) {
-  return [
-    { role: "system", content: formatSystemPrompt() },
-    ...mem.map(m => ({ role: m.role === "AVA" ? "assistant" : "user", content: m.text })),
-    { role: "user", content: (geo ? geo + "\n\n" : "") + (vis ? vis + "\n\n" : "") + val }
-  ];
-}
-function handleInferenceError(e) {
-  console.error(e);
-  append("AVA", "Inference failed.");
-}
-function enableSendButton() {
-  sendBtn.disabled = false;
-}
-function disableSendButton() {
-  sendBtn.disabled = true;
-}
-function clearInputField() {
-  input.value = "";
-}
-function processUserMessage(val) {
-  append("USER", val);
-  disableSendButton();
-}
-function addThinkingIndicator() {
-  return append("AVA", "Thinking …");
-}
-function replaceThinkingWithResponse(lastMsg, responseText) {
-  lastMsg.querySelector(".content").textContent = responseText;
-}
-function restoreSendButton() {
-  enableSendButton();
-}
+input.onkeydown = (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    transmit();
+  }
+};
 if (mem.length === 0) {
   append("AVA", "PROJECT_AVA V1 ready. Choose your engine to begin.");
 } else {
