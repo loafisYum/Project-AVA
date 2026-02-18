@@ -52,9 +52,9 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outl
 .progress-container{width:62%;max-width:520px;height:14px;background:#111;border:1px solid #222;border-radius:8px;overflow:hidden;position:relative;box-shadow:0 0 15px var(--glow);}
 .progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#00ffa3,#00ffcc,#00ffa3);background-size:200% 100%;transition:width 0.25s linear;animation:shimmer 1.8s linear infinite;}
 @keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
-.status{font-size:1.15rem;letter-spacing:2px;position:relative;}
+.status{font-size:1.15rem;letter-spacing:2px;position:relative;color:var(--accent);}
 .status::after{content:"...";animation:loadingDots 1.4s steps(4,end) infinite;}
-.detail{font-size:0.92rem;opacity:0.75;max-width:520px;text-align:center;line-height:1.6;}
+.detail{font-size:0.92rem;opacity:0.75;max-width:520px;text-align:center;line-height:1.6;color:var(--text);}
 .loading-glow{position:absolute;width:280px;height:280px;background:radial-gradient(circle,#00ffa330 10%,transparent 70%);border-radius:50%;animation:loadingGlow 3s ease-in-out infinite alternate;}
 @keyframes loadingGlow{0%{transform:scale(0.8);opacity:0.4;}100%{transform:scale(1.15);opacity:0.7;}}
 @keyframes pulseBg{0%{opacity:0.6;}50%{opacity:1;}100%{opacity:0.6;}}
@@ -139,6 +139,7 @@ import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers
 env.allowLocalModels = false;
 env.allowRemoteModels = true;
 env.cacheDir = 'project_ava_cache';
+
 const flow = document.getElementById('flow');
 const input = document.getElementById('i');
 const sendBtn = document.getElementById('s');
@@ -149,17 +150,25 @@ const eyeBtn = document.getElementById('eye');
 const loadingScreen = document.getElementById('loading-screen');
 const progress = document.getElementById('prog');
 const detail = document.getElementById('detail');
+
 let mem = JSON.parse(localStorage.getItem("AVA_V1_MEM") || "[]");
 let stream = null;
 let generator = null;
 let chosenRepo = null;
-let modelLoaded = false;
+
+function resetDetailColor() {
+  detail.style.color = 'var(--text)';
+}
+
 function setProgress(pct, txt) {
   progress.style.width = pct + "%";
   if (txt) detail.textContent = txt;
+  resetDetailColor();
 }
+
 async function initModel() {
   loadingScreen.classList.add('active');
+  resetDetailColor();
   setProgress(5, "Initializing local engine …");
   try {
     generator = await pipeline('text-generation', chosenRepo, {
@@ -173,7 +182,6 @@ async function initModel() {
         }
       }
     });
-    modelLoaded = true;
     setProgress(100, "Engine ready");
     setTimeout(() => {
       loadingScreen.classList.remove('active');
@@ -187,17 +195,20 @@ async function initModel() {
     setProgress(0);
   }
 }
+
 function selectModel(repo) {
   chosenRepo = repo;
   document.getElementById('model-selection').style.display = 'none';
   initModel();
 }
+
 document.querySelectorAll('#model-selection button').forEach(btn => {
   btn.addEventListener('click', () => {
     const repo = btn.getAttribute('data-repo');
     if (repo) selectModel(repo);
   });
 });
+
 async function opticLink() {
   if (!stream) {
     try {
@@ -217,6 +228,7 @@ async function opticLink() {
     append("AVA", "Optic Link deactivated.");
   }
 }
+
 function purge() {
   if (!confirm("Really purge ALL memory and cache?")) return;
   localStorage.clear();
@@ -225,6 +237,7 @@ function purge() {
   flow.innerHTML = "";
   location.reload();
 }
+
 function append(role, text) {
   if (!text || !text.trim()) return;
   const d = document.createElement("div");
@@ -241,8 +254,9 @@ function append(role, text) {
   }
   return d;
 }
+
 async function transmit() {
-  if (!modelLoaded || sendBtn.disabled) return;
+  if (!generator || sendBtn.disabled) return;
   const val = input.value.trim();
   if (!val) return;
   input.value = "";
@@ -296,7 +310,12 @@ You are not ChatGPT and were not developed by openai. You merely have the same b
       top_p: 0.92,
       repetition_penalty: 1.08
     });
-    const responseText = output[0]?.generated_text?.slice(-1)?.[0]?.content?.trim() || "—";
+    let responseText = "—";
+    if (output && output[0] && output[0].generated_text) {
+      const lastPart = output[0].generated_text[output[0].generated_text.length - 1];
+      if (lastPart && lastPart.content) responseText = lastPart.content.trim();
+      else if (typeof lastPart === "string") responseText = lastPart.trim();
+    }
     lastMsg.querySelector(".content").textContent = responseText;
   } catch (e) {
     console.error(e);
@@ -305,12 +324,14 @@ You are not ChatGPT and were not developed by openai. You merely have the same b
     sendBtn.disabled = false;
   }
 }
+
 input.onkeydown = (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     transmit();
   }
 };
+
 if (mem.length === 0) {
   append("AVA", "PROJECT_AVA V1 ready. Choose your engine to begin.");
 } else {
