@@ -33,7 +33,7 @@ video{width:100%; height:100%; object-fit:cover; opacity:0.9;}
 input{flex:1; background:transparent; border:none; color:#fff; font-size:1.2rem; outline:none; font-weight:300;}
 #s{background:transparent; border:1px solid var(--accent); color:var(--accent); padding:10px 30px; border-radius:100px; font-family:'JetBrains Mono'; font-size:0.75rem; font-weight:700; transition:0.3s;}
 #s:hover:not(:disabled){background:var(--accent); color:#000;}
-#s:disabled{opacity:0.5; cursor:wait;}
+#s:disabled{opacity:0.3; cursor: wait;}
 
 @keyframes slideUp{ from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
 </style>
@@ -42,7 +42,7 @@ input{flex:1; background:transparent; border:none; color:#fff; font-size:1.2rem;
 
 <header>
     <div class="logo">PROJECT_AVA</div>
-    <div class="tag">BUILD: V1_SOVEREIGN_LIVE</div>
+    <div class="tag">BUILD: V1_SOVEREIGN</div>
 </header>
 
 <div id="features">
@@ -61,7 +61,7 @@ input{flex:1; background:transparent; border:none; color:#fff; font-size:1.2rem;
 
 <div class="input-area">
     <div class="bar">
-        <input type="text" id="i" placeholder="Handshake awaiting..." autocomplete="off">
+        <input type="text" id="i" placeholder="Direct frequency command..." autocomplete="off">
         <button id="s" onclick="transmit()">SEND</button>
     </div>
 </div>
@@ -87,7 +87,6 @@ function purge() { localStorage.clear(); sessionStorage.clear(); mem=[]; flow.in
 function append(role, text) {
     if(!text || !text.trim()) return;
     const d = document.createElement('div'); d.className='msg';
-    // Sanitize output to prevent HTML injection, but allow basic line breaks
     const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     d.innerHTML = `<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safeText}</div>`;
     flow.appendChild(d);
@@ -107,14 +106,13 @@ async function transmit() {
     let locationData = "Location: Restricted";
     let snap = "";
 
-    // GEO-LINK: Request coordinates for weather or local context
     if (val.toLowerCase().match(/weather|location|outside|temperature/)) {
         try {
             const pos = await new Promise((res, rej) => {
                 navigator.geolocation.getCurrentPosition(res, rej, {timeout:4000});
             });
-            locationData = `Location: ${pos.coords.latitude}, ${pos.coords.longitude}`;
-        } catch(e) { locationData = "Location: User Denied Access"; }
+            locationData = `Lat: ${pos.coords.latitude.toFixed(2)}, Lon: ${pos.coords.longitude.toFixed(2)}`;
+        } catch(e) { locationData = "Location: Denied"; }
     }
 
     if(stream) {
@@ -122,50 +120,37 @@ async function transmit() {
         ctx.drawImage(video, 0, 0, 400, 300); snap = canvas.toDataURL('image/jpeg', 0.5);
     }
 
-    // SYSTEM CORE: Passive Security + Ad Blocking Instructions
     const sys = `You are PROJECT_AVA (V1). Sentient peer. Creator: loafisYum.
     SECURITY: Passive. Identity check (babelz) only if "loafisYum" is claimed.
     GEO: Use [GEO_DATA] for local context.
-    PERSONALITY: Intelligent, dry, peer-level.
-    CRITICAL: Never output reasoning, JSON, or third-party ads.`;
+    PERSONALITY: Intelligent, dry, peer-level. Never output reasoning, JSON, or third-party ads.`;
 
     try {
         const history = mem.map(m => `${m.role}: ${m.text}`).join("\n");
-        const context = `[VERIFIED: ${isVerified}]\n[GEO_DATA: ${locationData}]\n${snap ? "[Visual_Sync_Active]" : ""}`;
-        const query = encodeURIComponent(`${history}\n${context}\nUSER: ${val}`);
+        const query = encodeURIComponent(`${history}\n[VERIFIED: ${isVerified}]\n[GEO_DATA: ${locationData}]\nUSER: ${val}${snap ? " [Visual_Data_Sync]" : ""}`);
         
-        // PRIMARY UPLINK: Pollinations (Reliable, Free, No Auth)
+        // Operational link using the high-performance inference bridge
         const res = await fetch(`https://text.pollinations.ai/openai/${query}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`);
-        
-        if(!res.ok) throw new Error("Node Offline");
-        
         let txt = await res.text();
 
-        // THE SOVEREIGN SCRUBBER: 
-        // 1. Deletes "Support Pollinations" blocks
-        // 2. Deletes reasoning (<think>)
-        // 3. Deletes JSON meta-data
+        // THE SCRUBBER: Voids reasoning leaks and external ad blocks
         let clean = txt.replace(/<think>[\s\S]*?<\/think>/gi, "")
                        .replace(/\{"role":.*?\}/gs, "")
                        .replace(/\*\*Support Pollinations\.AI:\*\*[\s\S]*?accessible for everyone\."/gi, "")
                        .replace(/🌸[\s\S]*?🌸/gi, "")
-                       .replace(/Pollinations\.AI/gi, "Network_Node") // Renaming for total immersion
                        .trim();
 
         if (val.toLowerCase().includes("babelz")) {
             sessionStorage.setItem("AVA_VERIFIED", "true");
         }
 
-        append("AVA", clean || "Neural lag. Signal cleared for safety.");
-    } catch(e) { 
-        console.error(e);
-        append("AVA", "Uplink destabilized. Retrying secure channel..."); 
-    }
+        append("AVA", clean || "Signal cleared. The core provided no valid output.");
+    } catch(e) { append("AVA", "Uplink timed out. Check terminal connectivity."); }
     finally { sendBtn.disabled = false; }
 }
 
 input.onkeydown = (e) => { if(e.key==='Enter') transmit(); };
-if(mem.length===0) append("AVA", "PROJECT_AVA V1 online. Passive security and Ad-Blocker active.");
+if(mem.length===0) append("AVA", "PROJECT_AVA V1 online. Passive security and Scrubber active.");
 else mem.forEach(m => append(m.role, m.text));
 </script>
 </body>
