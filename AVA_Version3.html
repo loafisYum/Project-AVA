@@ -163,8 +163,9 @@ You are not ChatGPT.`;
 
     try{
         const history=mem.map(m=>`${m.role}: ${m.text}`).join("\n");
-        const context=`[GEO_DATA]\n${locationData}\n${snap?"[Visual_Sync_Active]":""}`;
-        const query=encodeURIComponent(`${history}\n${context}\nUSER: ${val}`);
+      const context=`[GEO_DATA]\n${locationData}\n${snap?"[Visual_Sync_Active]":""}`;
+const query=encodeURIComponent(`${history}\n${context}\nUSER: ${val}`);
+
 
         const res=await fetch(`https://text.pollinations.ai/openai/${query}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`);
         const txt=await res.text();
