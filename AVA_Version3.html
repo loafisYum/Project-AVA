@@ -66,45 +66,66 @@ function append(role,text){
   return msg;
 }
 
-// initialize Llama 3 1B core immediately
+// initialize Llama core, fallback to remote
 async function initCore(){
   append("AVA","Initializing Project_AVA Llama 1B…");
+  sendBtn.disabled = true;
   try{
+    // Try local Llama first
     generator = await pipeline('text-generation','onnx-community/Llama-3.2-1B-Instruct-ONNX',{quantized:true});
     append("AVA","Project_AVA V1.2 active. Ready for your commands.");
-    sendBtn.disabled = false;
+    sendBtn.disabled=false;
   }catch(e){
-    console.error(e);
-    append("AVA","Initialization failed. Try again later.");
+    console.warn("Local Llama failed, falling back to Pollinations.ai:", e);
+    append("AVA","Local core failed, switching to remote fallback...");
+    try{
+      // Remote Pollinations pipeline (text generation)
+      generator = await pipeline('text-generation','Xenova/gpt2',{quantized:false, progress_callback:()=>{}});
+      append("AVA","Remote core active. Project_AVA ready.");
+      sendBtn.disabled=false;
+    }catch(err){
+      console.error(err);
+      append("AVA","Both local and remote cores failed. Try again later.");
+    }
   }
 }
 
-// send message with streaming
+// send message with streaming if supported
 async function sendMessage(){
   const val = input.value.trim();
   if(!val || !generator) return;
-  input.value = "";
+  input.value="";
   append("USER",val);
   mem.push({role:"USER",text:val});
-  sendBtn.disabled = true;
+  sendBtn.disabled=true;
 
-  const systemPrompt = `You are PROJECT_AVA (V1.2, Llama 1B). Intelligent, dry, peer-level. Local only. Respond as Project_AVA with logic and reasoning.`;
+  const systemPrompt = `You are PROJECT_AVA (V1.2). Intelligent, dry, peer-level. Respond as Project_AVA with logic and reasoning.`;
 
   try{
     const lastMsg = append("AVA",""); // placeholder for streaming
-    await generator(
-      [
-        {role:"system",content:systemPrompt},
-        {role:"user",content:val}
-      ],
-      {
+    if(generator.stream_callback){ // local streaming
+      await generator(
+        [
+          {role:"system",content:systemPrompt},
+          {role:"user",content:val}
+        ],
+        {
+          max_new_tokens:256,
+          do_sample:true,
+          temperature:0.7,
+          return_full_text:false,
+          stream_callback: token=>{lastMsg.querySelector(".content").textContent += token;}
+        }
+      );
+    }else{ // remote fallback (no streaming)
+      const out = await generator([{role:"system",content:systemPrompt},{role:"user",content:val}],{
         max_new_tokens:256,
         do_sample:true,
         temperature:0.7,
-        return_full_text:false,
-        stream_callback: token => { lastMsg.querySelector(".content").textContent += token; }
-      }
-    );
+        return_full_text:false
+      });
+      lastMsg.querySelector(".content").textContent = out[0].generated_text;
+    }
     mem.push({role:"AVA",text:lastMsg.querySelector(".content").textContent});
     if(mem.length>15) mem.shift();
     localStorage.setItem("AVA_V1_MEM",JSON.stringify(mem));
@@ -116,7 +137,6 @@ async function sendMessage(){
   }
 }
 
-// setup send button and Enter key
 sendBtn.onclick = sendMessage;
 input.addEventListener("keydown",e=>{if(e.key==="Enter") sendMessage();});
 
