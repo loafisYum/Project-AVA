@@ -138,7 +138,10 @@ async function transmit(){
     let geoBlock="";
     let visualBlock="";
 
-    const wantsLocation=/where|location|standort|wo bin ich|koordinaten|latitude|longitude|coordinates/i.test(val);
+   const locationIntent = /where|location|latitude|longitude|coordinates/i.test(val);
+const weatherIntent = /weather|temperature|rain|forecast|snow|wind|humidity/i.test(val);
+
+const wantsLocation = locationIntent || weatherIntent;
     const wantsVision=/what am i showing|what do you see|was zeige ich|describe what you see/i.test(val);
 
     // GEO nur wenn wirklich gefragt
