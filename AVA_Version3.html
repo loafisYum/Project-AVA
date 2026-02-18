@@ -26,18 +26,6 @@ body{
   overflow:hidden;
   position:relative;
 }
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:linear-gradient(rgba(0,255,163,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,163,0.025) 1px,transparent 1px);
-  background-size:50px 50px;
-  pointer-events:none;
-  z-index:-1;
-  animation:gridMove 60s linear infinite;
-}
-@keyframes gridMove{0%{background-position:0 0}100%{background-position:50px 50px}}
-
 header{
   padding:22px 40px;
   display:flex;
@@ -56,422 +44,170 @@ header{
   text-shadow:0 0 20px var(--glow);
 }
 .tag{font-size:0.65rem;opacity:0.45;font-family:'JetBrains Mono';letter-spacing:3px;}
+.burger{
+  width:30px;height:20px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
+}
+.burger span{
+  display:block;height:4px;background:var(--accent);border-radius:2px;transition:0.3s;
+}
+.burger.active span:nth-child(1){transform:rotate(45deg) translateY(8px);}
+.burger.active span:nth-child(2){opacity:0;}
+.burger.active span:nth-child(3){transform:rotate(-45deg) translateY(-8px);}
 
-#model-selection{
-  position:fixed;
-  inset:0;
-  background:rgba(2,2,3,0.99);
-  z-index:9999;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:40px;
-  padding:30px;
+#model-menu{
+  position:fixed;top:0;left:-300px;width:300px;height:100%;background:var(--panel);
+  border-right:1px solid var(--border);padding:30px;display:flex;flex-direction:column;gap:25px;transition:0.4s;z-index:9999;
 }
-.selection-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
-  gap:28px;
-  max-width:1250px;
-  width:100%;
-}
+#model-menu.active{left:0;}
 .model-card{
-  background:var(--panel);
-  border:2px solid var(--border);
-  border-radius:20px;
-  padding:32px 28px;
-  text-align:center;
-  transition:0.5s cubic-bezier(0.23,1,0.32,1);
-  cursor:pointer;
+  background:var(--panel);border:2px solid var(--border);border-radius:20px;
+  padding:20px;text-align:center;cursor:pointer;transition:0.3s;
 }
-.model-card:hover{
-  border-color:var(--accent);
-  transform:translateY(-14px) scale(1.04);
-  box-shadow:0 0 70px var(--glow);
-}
-.model-card h3{
-  font-size:1.5rem;
-  margin-bottom:12px;
-  color:var(--accent);
-  letter-spacing:2px;
-}
-.model-card .size{
-  font-family:'JetBrains Mono';
-  font-size:1.05rem;
-  color:#00ffa380;
-  margin-bottom:18px;
-}
-.model-card .desc{
-  line-height:1.6;
-  font-weight:300;
-  min-height:88px;
-}
+.model-card:hover{border-color:var(--accent);box-shadow:0 0 40px var(--glow);}
+.model-card h3{color:var(--accent);margin-bottom:8px;}
+.model-card .size{color:#00ffa380;margin-bottom:6px;}
 .model-card button{
-  background:transparent;
-  border:2px solid var(--accent);
-  color:var(--accent);
-  padding:15px 42px;
-  border-radius:999px;
-  font-family:'JetBrains Mono';
-  font-weight:700;
-  font-size:0.95rem;
-  cursor:pointer;
-  margin-top:25px;
-  transition:0.4s;
+  background:transparent;border:2px solid var(--accent);color:var(--accent);padding:8px 22px;border-radius:999px;cursor:pointer;
 }
-.model-card button:hover{
-  background:var(--accent);
-  color:#000;
-  box-shadow:0 0 40px var(--glow);
-}
+.model-card button:hover{background:var(--accent);color:#000;box-shadow:0 0 30px var(--glow);}
 
-#features{
-  background:#040405;
-  padding:14px 40px;
-  display:flex;
-  gap:22px;
-  border-bottom:1px solid var(--border);
-}
-.f-btn{
-  background:transparent;
-  border:1px solid #1a1a1c;
-  color:#555;
-  padding:9px 22px;
-  border-radius:999px;
-  font-family:'JetBrains Mono';
-  font-size:0.65rem;
-  transition:0.3s;
-  cursor:pointer;
-}
-.f-btn:hover{color:var(--accent);border-color:var(--accent);}
-.f-btn.active{color:var(--accent);border-color:var(--accent);box-shadow:0 0 10px var(--glow);}
-
-#viewport{
-  flex:1 1 auto;
-  min-height:0;
-  overflow-y:auto;
-  padding:40px 40px 20px;
-  scroll-behavior:smooth;
-  position:relative;
-}
-.container{max-width:860px;margin:0 auto;}
-
-#cam-stage{
-  display:none;
-  width:100%;
-  aspect-ratio:16/9;
-  background:#000;
-  border-radius:20px;
-  margin-bottom:45px;
-  border:2px solid var(--border);
-  overflow:hidden;
-  box-shadow:0 0 50px rgba(0,255,163,0.2);
-}
-video{width:100%;height:100%;object-fit:cover;opacity:0.96;}
-
-.msg{
-  margin-bottom:48px;
-  animation:slideUp 0.6s cubic-bezier(0.23,1,0.32,1);
-}
-.role{
-  font-family:'JetBrains Mono';
-  font-size:0.7rem;
-  color:var(--accent);
-  margin-bottom:9px;
-  letter-spacing:5px;
-  font-weight:700;
-}
-.content{
-  font-size:1.2rem;
-  line-height:1.8;
-  font-weight:300;
-  white-space:pre-wrap;
-  word-break:break-word;
-}
+#viewport{flex:1 1 auto;overflow-y:auto;padding:20px;scroll-behavior:smooth;}
+.msg{margin-bottom:25px;}
+.role{font-family:'JetBrains Mono';font-size:0.7rem;color:var(--accent);margin-bottom:3px;font-weight:700;}
+.content{font-size:1.1rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
 
 .input-area{
-  padding:38px 40px;
-  background:var(--panel);
-  border-top:1px solid var(--border);
+  padding:15px 20px;background:var(--panel);border-top:1px solid var(--border);
 }
-.bar{
-  max-width:860px;
-  margin:0 auto;
-  display:flex;
-  gap:28px;
-  align-items:center;
-}
+.bar{display:flex;gap:15px;align-items:center;}
 input{
-  flex:1;
-  background:transparent;
-  border:none;
-  color:#fff;
-  font-size:1.28rem;
-  outline:none;
-  font-weight:300;
+  flex:1;background:transparent;border:none;color:#fff;font-size:1.1rem;outline:none;font-weight:300;
 }
-#s{
-  background:transparent;
-  border:2px solid var(--accent);
-  color:var(--accent);
-  padding:13px 40px;
-  border-radius:999px;
-  font-family:'JetBrains Mono';
-  font-size:0.88rem;
-  font-weight:700;
-  transition:0.4s;
-  cursor:pointer;
+#send-btn{
+  background:transparent;border:2px solid var(--accent);color:var(--accent);padding:10px 22px;border-radius:999px;cursor:pointer;
 }
-#s:hover:not(:disabled){
-  background:var(--accent);
-  color:#000;
-  box-shadow:0 0 45px var(--glow);
-}
-#s:disabled{opacity:0.4;cursor:not-allowed;}
-
-#loading-screen{
-  position:fixed;
-  inset:0;
-  background:rgba(2,2,3,0.99);
-  z-index:99999;
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:45px;
-  font-family:'JetBrains Mono';
-  color:var(--accent);
-}
-#loading-screen.active{display:flex;}
-.loading-glow{
-  width:360px;
-  height:360px;
-  background:radial-gradient(circle,#00ffa340 15%,transparent 75%);
-  border-radius:50%;
-  animation:loadingGlow 4.5s ease-in-out infinite alternate;
-  filter:blur(25px);
-}
-@keyframes loadingGlow{0%{transform:scale(0.7);opacity:0.6;}100%{transform:scale(1.35);opacity:0.9;}}
-.progress-container{
-  width:66%;
-  max-width:580px;
-  height:17px;
-  background:#111;
-  border:1px solid #222;
-  border-radius:999px;
-  overflow:hidden;
-  box-shadow:0 0 30px var(--glow);
-}
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#00ffa3,#00ffdd,#00ffa3);
-  background-size:400% 100%;
-  animation:shimmer 2.2s linear infinite;
-  transition:width 0.25s ease-out;
-}
-@keyframes shimmer{0%{background-position:-400% 0}100%{background-position:400% 0}}
-.status{
-  font-size:1.3rem;
-  letter-spacing:4px;
-  position:relative;
-}
-.status::after{content:"…";animation:dotPulse 1.5s infinite;}
-.detail{
-  font-size:0.96rem;
-  opacity:0.8;
-  max-width:540px;
-  text-align:center;
-  line-height:1.7;
-}
-@keyframes dotPulse{0%,100%{opacity:0.3}50%{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(35px);}to{opacity:1;transform:translateY(0);}}
+#send-btn:hover{background:var(--accent);color:#000;box-shadow:0 0 35px var(--glow);}
+#send-btn:disabled{opacity:0.4;cursor:not-allowed;}
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">PROJECT_AVA</div>
-  <div class="tag">BUILD: V1_SOVEREIGN_LOCAL</div>
+  <div style="display:flex;align-items:center;gap:15px;">
+    <div class="tag">BUILD: V1</div>
+    <div class="burger" id="burger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
 </header>
 
-<div id="model-selection">
-  <h1 style="font-size:2.8rem;letter-spacing:12px;color:var(--accent);">SELECT CORE</h1>
-  <p style="opacity:0.65;max-width:640px;text-align:center;">One-time download • 100% local forever</p>
-  <div class="selection-grid">
-    <div class="model-card" onclick="selectModel('Xenova/gpt2')">
-      <h3>ULTRA LIGHT</h3>
-      <p class="size">0.55 GB</p>
-      <p class="desc">Instant speed • Test mode</p>
-      <button>ACTIVATE</button>
-    </div>
-    <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-0.5B-Instruct-ONNX')">
-      <h3>LIGHTWEIGHT</h3>
-      <p class="size">0.9 GB</p>
-      <p class="desc">Fast daily driver</p>
-      <button>ACTIVATE</button>
-    </div>
-    <div class="model-card" style="border-color:var(--accent);box-shadow:0 0 60px var(--glow);" onclick="selectModel('onnx-community/Qwen2.5-1.5B-Instruct-ONNX')">
-      <h3>GOLDEN MIDDLE ★</h3>
-      <p class="size">1.6 GB</p>
-      <p class="desc"><strong>RECOMMENDED</strong><br>Perfect balance</p>
-      <button>ACTIVATE</button>
-    </div>
+<div id="model-menu">
+  <h2 style="color:var(--accent);letter-spacing:2px;">SELECT CORE</h2>
+  <div class="model-card" onclick="selectModel('Xenova/gpt2')">
+    <h3>ULTRA LIGHT</h3><div class="size">0.55 GB</div><div class="desc">Fast & tiny</div><button>ACTIVATE</button>
+  </div>
+  <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-0.5B-Instruct-ONNX')">
+    <h3>LIGHTWEIGHT</h3><div class="size">0.9 GB</div><div class="desc">Daily driver</div><button>ACTIVATE</button>
+  </div>
+  <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-1.5B-Instruct-ONNX')">
+    <h3>GOLDEN MIDDLE ★</h3><div class="size">1.6 GB</div><div class="desc">Recommended</div><button>ACTIVATE</button>
   </div>
 </div>
 
-<div id="features">
-  <button class="f-btn" id="eye" onclick="opticLink()">[ OPTIC_LINK ]</button>
-  <button class="f-btn" onclick="purge()">[ SECURE_WIPE ]</button>
-</div>
-
-<div id="viewport">
-  <div class="container">
-    <div id="cam-stage"><video id="v" autoplay playsinline muted></video></div>
-    <div id="flow"></div>
-  </div>
-</div>
-
-<canvas id="c" style="display:none;"></canvas>
+<div id="viewport"></div>
 
 <div class="input-area">
   <div class="bar">
-    <input type="text" id="i" placeholder="Handshake awaiting..." autocomplete="off">
-    <button id="s" onclick="transmit()" disabled>SEND</button>
+    <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
+    <button id="send-btn" disabled>SEND</button>
   </div>
-</div>
-
-<div id="loading-screen">
-  <div class="loading-glow"></div>
-  <div class="status">Downloading sovereign core</div>
-  <div class="progress-container"><div class="progress-bar" id="prog"></div></div>
-  <div class="detail" id="detail">One-time download. Everything stays on your device.</div>
 </div>
 
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-env.allowLocalModels = true;  // ✅ allow caching
+env.allowLocalModels = true;
 env.allowRemoteModels = true;
 env.cacheDir = 'project_ava_cache';
 
-const flow = document.getElementById('flow');
-const input = document.getElementById('i');
-const sendBtn = document.getElementById('s');
-const video = document.getElementById('v');
-const stage = document.getElementById('cam-stage');
-const eyeBtn = document.getElementById('eye');
-const loadingScreen = document.getElementById('loading-screen');
-const progress = document.getElementById('prog');
-const detail = document.getElementById('detail');
+const viewport = document.getElementById('viewport');
+const input = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const burger = document.getElementById('burger');
+const modelMenu = document.getElementById('model-menu');
 
-let mem = JSON.parse(localStorage.getItem("AVA_V1_MEM") || "[]");
-let stream = null;
 let generator = null;
-let chosenRepo = null;
+let chosenModel = null;
+let mem = JSON.parse(localStorage.getItem("AVA_V1_MEM") || "[]");
 
-function setProgress(pct, txt="") {
-  progress.style.width = pct + "%";
-  if(txt) detail.textContent = txt;
+// burger menu toggle
+burger.onclick = ()=>{
+  burger.classList.toggle("active");
+  modelMenu.classList.toggle("active");
+};
+
+// append message
+function append(role, text){
+  if(!text.trim()) return;
+  const msg = document.createElement("div");
+  msg.className = "msg";
+  msg.innerHTML = `<div class="role">${role}</div><div class="content">${text}</div>`;
+  viewport.appendChild(msg);
+  viewport.scrollTop = viewport.scrollHeight;
 }
 
-window.selectModel = async (repo) => {
-  chosenRepo = repo;
-  document.getElementById('model-selection').style.display = 'none';
-  loadingScreen.classList.add('active');
-  setProgress(5, "Initializing sovereign core…");
-
+// select a model
+window.selectModel = async (model) => {
+  chosenModel = model;
+  modelMenu.classList.remove("active");
+  burger.classList.remove("active");
+  append("AVA", `Loading core ${model.split('/').pop()}…`);
+  sendBtn.disabled = true;
   try {
-    generator = await pipeline('text-generation', chosenRepo, {
-      quantized: true,
-      progress_callback: (data) => {
-        if(data.status==='progress' && data.file){
-          const pct = Math.round((data.loaded/data.total)*100);
-          setProgress(pct, `Downloading ${data.file.split('/').pop()} … ${pct}%`);
-        }
+    generator = await pipeline('text-generation', chosenModel, {
+      quantized:true,
+      progress_callback:(data)=>{
+        // optional: handle progress
       }
     });
-
-    setProgress(100, "Core active.");
-    setTimeout(() => {
-      loadingScreen.classList.remove('active');
-      sendBtn.disabled = false;
-      if(mem.length===0) append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
-    },900);
-  } catch(err){
-    console.error(err);
-    detail.style.color='var(--error)';
-    detail.textContent="Initialization failed. Try ULTRA LIGHT core if your RAM/browser is limited.";
+    append("AVA", `Core ${chosenModel.split('/').pop()} active.`);
+    sendBtn.disabled = false;
+  } catch(e){
+    console.error(e);
+    append("AVA", "Initialization failed. Use ULTRA LIGHT core if browser lags.");
   }
 };
 
-window.opticLink = async () => {
-  if(!stream){
-    try{
-      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
-      video.srcObject = stream;
-      stage.style.display = "block";
-      eyeBtn.classList.add("active");
-      append("AVA","Optic Link activated.");
-    }catch(e){append("AVA","Camera permission denied.");}
-  }else{
-    stream.getTracks().forEach(t=>t.stop());
-    stream=null;
-    stage.style.display="none";
-    eyeBtn.classList.remove("active");
-    append("AVA","Optic Link deactivated.");
-  }
-};
-
-window.purge = () => {
-  if(!confirm("PURGE ALL MEMORY AND CACHE?")) return;
-  localStorage.clear();
-  indexedDB.deleteDatabase('transformers.js');
-  mem=[];
-  flow.innerHTML="";
-  location.reload();
-};
-
-function append(role,text){
-  if(!text||!text.trim())return;
-  const d=document.createElement("div");
-  d.className="msg";
-  const safe=text.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  d.innerHTML=`<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safe}</div>`;
-  flow.appendChild(d);
-  flow.scrollTop=flow.scrollHeight;
-  return d;
-}
-
-window.transmit=async ()=>{
-  if(!generator||sendBtn.disabled)return;
-  const val=input.value.trim();
-  if(!val)return;
-  input.value="";
-  append("USER",val);
+// send a message
+async function sendMessage(){
+  const val = input.value.trim();
+  if(!val || !generator) return;
+  input.value = "";
+  append("USER", val);
   mem.push({role:"USER",text:val});
-  sendBtn.disabled=true;
+  sendBtn.disabled = true;
 
   try{
-    const last=append("AVA","Thinking …");
-    const out=await generator(val,{max_new_tokens:512,do_sample:true,temperature:0.7,return_full_text:false});
-    const resp=out.generated_text?.trim()||"No response generated.";
-    last.querySelector(".content").textContent=resp;
+    const out = await generator(val,{max_new_tokens:256,do_sample:true,temperature:0.7,return_full_text:false});
+    const resp = out.generated_text?.trim() || "No response.";
+    append("AVA", resp);
     mem.push({role:"AVA",text:resp});
     if(mem.length>15) mem.shift();
     localStorage.setItem("AVA_V1_MEM",JSON.stringify(mem));
-  }catch(e){
+  } catch(e){
     console.error(e);
-    append("AVA","Inference error. Core might be overloaded.");
-  }finally{
-    sendBtn.disabled=false;
+    append("AVA", "Inference error.");
+  } finally {
+    sendBtn.disabled = false;
   }
-};
+}
 
-input.onkeydown=e=>{if(e.key==="Enter")transmit();};
-if(mem.length>0)mem.forEach(m=>append(m.role,m.text));
-else append("AVA","PROJECT_AVA V1 ready. Choose your core to begin.");
+sendBtn.onclick = sendMessage;
+input.addEventListener("keydown", e=>{ if(e.key==="Enter") sendMessage(); });
+
+// restore previous session
+mem.forEach(m=>append(m.role==='AVA'?'AVA':'USER', m.text));
 </script>
 
 </body>
