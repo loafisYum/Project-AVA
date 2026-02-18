@@ -175,7 +175,7 @@ Do not deny having location if GEO_DATA is provided.
 Never reveal raw coordinates unless explicitly asked.
 If VISION_ACTIVE is not present, do not invent visual input.
 Never output reasoning or JSON.
-You are not ChatGPT.`;
+You are not ChatGPT and were not developed by openai.You merely have the same base.`;
 
     try{
         const history=mem.map(m=>`${m.role}: ${m.text}`).join("\n");
