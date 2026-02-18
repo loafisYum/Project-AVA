@@ -318,18 +318,6 @@ input{
       <p class="desc"><strong>RECOMMENDED</strong><br>Perfect balance</p>
       <button>ACTIVATE</button>
     </div>
-    <div class="model-card" onclick="selectModel('onnx-community/Llama-3.2-1B-Instruct-ONNX')">
-      <h3>HIGH PERF</h3>
-      <p class="size">1.3 GB</p>
-      <p class="desc">Strong reasoning</p>
-      <button>ACTIVATE</button>
-    </div>
-    <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-3B-Instruct-ONNX')">
-      <h3>MAXIMUM</h3>
-      <p class="size">3.2 GB</p>
-      <p class="desc">Smartest answers</p>
-      <button>ACTIVATE</button>
-    </div>
   </div>
 </div>
 
@@ -364,7 +352,7 @@ input{
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-env.allowLocalModels = false;
+env.allowLocalModels = true;  // ✅ allow caching
 env.allowRemoteModels = true;
 env.cacheDir = 'project_ava_cache';
 
@@ -373,7 +361,6 @@ const input = document.getElementById('i');
 const sendBtn = document.getElementById('s');
 const video = document.getElementById('v');
 const stage = document.getElementById('cam-stage');
-const canvas = document.getElementById('c');
 const eyeBtn = document.getElementById('eye');
 const loadingScreen = document.getElementById('loading-screen');
 const progress = document.getElementById('prog');
@@ -384,9 +371,9 @@ let stream = null;
 let generator = null;
 let chosenRepo = null;
 
-function setProgress(pct, txt = "") {
+function setProgress(pct, txt="") {
   progress.style.width = pct + "%";
-  if (txt) detail.textContent = txt;
+  if(txt) detail.textContent = txt;
 }
 
 window.selectModel = async (repo) => {
@@ -394,99 +381,97 @@ window.selectModel = async (repo) => {
   document.getElementById('model-selection').style.display = 'none';
   loadingScreen.classList.add('active');
   setProgress(5, "Initializing sovereign core…");
+
   try {
     generator = await pipeline('text-generation', chosenRepo, {
       quantized: true,
       progress_callback: (data) => {
-        if (data.status === 'progress' && data.file) {
-          const pct = Math.round((data.loaded / data.total) * 100);
+        if(data.status==='progress' && data.file){
+          const pct = Math.round((data.loaded/data.total)*100);
           setProgress(pct, `Downloading ${data.file.split('/').pop()} … ${pct}%`);
         }
       }
     });
+
     setProgress(100, "Core active.");
     setTimeout(() => {
       loadingScreen.classList.remove('active');
       sendBtn.disabled = false;
-      if (mem.length === 0) append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
-    }, 900);
-  } catch (err) {
+      if(mem.length===0) append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
+    },900);
+  } catch(err){
     console.error(err);
-    detail.style.color = 'var(--error)';
-    detail.textContent = "Initialization failed. Try a smaller core.";
+    detail.style.color='var(--error)';
+    detail.textContent="Initialization failed. Try ULTRA LIGHT core if your RAM/browser is limited.";
   }
 };
 
 window.opticLink = async () => {
-  if (!stream) {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+  if(!stream){
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
       video.srcObject = stream;
       stage.style.display = "block";
       eyeBtn.classList.add("active");
-      append("AVA", "Optic Link activated.");
-    } catch (e) {
-      append("AVA", "Camera permission denied.");
-    }
-  } else {
-    stream.getTracks().forEach(t => t.stop());
-    stream = null;
-    stage.style.display = "none";
+      append("AVA","Optic Link activated.");
+    }catch(e){append("AVA","Camera permission denied.");}
+  }else{
+    stream.getTracks().forEach(t=>t.stop());
+    stream=null;
+    stage.style.display="none";
     eyeBtn.classList.remove("active");
-    append("AVA", "Optic Link deactivated.");
+    append("AVA","Optic Link deactivated.");
   }
 };
 
 window.purge = () => {
-  if (!confirm("PURGE ALL MEMORY AND CACHE?")) return;
+  if(!confirm("PURGE ALL MEMORY AND CACHE?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
-  mem = [];
-  flow.innerHTML = "";
+  mem=[];
+  flow.innerHTML="";
   location.reload();
 };
 
-function append(role, text) {
-  if (!text || !text.trim()) return;
-  const d = document.createElement("div");
-  d.className = "msg";
-  const safe = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  d.innerHTML = `<div class="role">${role === 'AVA' ? 'PROJECT_AVA' : 'USER'}</div><div class="content">${safe}</div>`;
+function append(role,text){
+  if(!text||!text.trim())return;
+  const d=document.createElement("div");
+  d.className="msg";
+  const safe=text.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  d.innerHTML=`<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
-  flow.scrollTop = flow.scrollHeight;
+  flow.scrollTop=flow.scrollHeight;
   return d;
 }
 
-window.transmit = async () => {
-  if (!generator || sendBtn.disabled) return;
-  const val = input.value.trim();
-  if (!val) return;
-  input.value = "";
-  append("USER", val);
-  mem.push({ role: "USER", text: val });
+window.transmit=async ()=>{
+  if(!generator||sendBtn.disabled)return;
+  const val=input.value.trim();
+  if(!val)return;
+  input.value="";
+  append("USER",val);
+  mem.push({role:"USER",text:val});
+  sendBtn.disabled=true;
 
-  sendBtn.disabled = true;
-
-  try {
-    const last = append("AVA", "Thinking …");
-    const out = await generator(val, { max_new_tokens: 512, do_sample: true, temperature: 0.7, return_full_text: false });
-    const resp = out.generated_text?.trim() || "No response generated.";
-    last.querySelector(".content").textContent = resp;
-    mem.push({ role: "AVA", text: resp });
-    if (mem.length > 15) mem.shift();
-    localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
-  } catch (e) {
+  try{
+    const last=append("AVA","Thinking …");
+    const out=await generator(val,{max_new_tokens:512,do_sample:true,temperature:0.7,return_full_text:false});
+    const resp=out.generated_text?.trim()||"No response generated.";
+    last.querySelector(".content").textContent=resp;
+    mem.push({role:"AVA",text:resp});
+    if(mem.length>15) mem.shift();
+    localStorage.setItem("AVA_V1_MEM",JSON.stringify(mem));
+  }catch(e){
     console.error(e);
-    append("AVA", "Inference error. Core might be overloaded.");
-  } finally {
-    sendBtn.disabled = false;
+    append("AVA","Inference error. Core might be overloaded.");
+  }finally{
+    sendBtn.disabled=false;
   }
 };
 
-input.onkeydown = e => { if (e.key === "Enter") transmit(); };
-
-if (mem.length > 0) mem.forEach(m => append(m.role, m.text));
-else append("AVA", "PROJECT_AVA V1 ready. Choose your core to begin.");
+input.onkeydown=e=>{if(e.key==="Enter")transmit();};
+if(mem.length>0)mem.forEach(m=>append(m.role,m.text));
+else append("AVA","PROJECT_AVA V1 ready. Choose your core to begin.");
 </script>
 
 </body>
