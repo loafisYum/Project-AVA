@@ -59,7 +59,6 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outl
 <button id="s" onclick="transmit()">SEND</button>
 </div>
 </div>
-
 <script>
 const flow=document.getElementById('flow');
 const input=document.getElementById('i');
@@ -119,6 +118,16 @@ function append(role,text){
     }
 }
 
+async function getLocation(){
+    return new Promise((res,rej)=>{
+        navigator.geolocation.getCurrentPosition(res,rej,{
+            enableHighAccuracy:true,
+            timeout:10000,
+            maximumAge:0
+        });
+    });
+}
+
 async function transmit(){
     const val=input.value;
     if(!val||sendBtn.disabled)return;
@@ -126,57 +135,65 @@ async function transmit(){
     append("USER",val);
     sendBtn.disabled=true;
 
-    let locationData="Location: Pending";
-    let snap="";
+    let geoBlock="";
+    let visualBlock="";
 
-    try{
-        const pos=await new Promise((res,rej)=>{
-            navigator.geolocation.getCurrentPosition(res,rej,{
-                enableHighAccuracy:true,
-                timeout:10000,
-                maximumAge:0
-            });
-        });
+    const wantsLocation=/where|location|standort|wo bin ich|koordinaten|latitude|longitude|coordinates/i.test(val);
+    const wantsVision=/what am i showing|what do you see|was zeige ich|describe what you see/i.test(val);
 
-        locationData=`Latitude: ${pos.coords.latitude}
+    // GEO nur wenn wirklich gefragt
+    if(wantsLocation){
+        try{
+            const pos=await getLocation();
+            geoBlock=`[GEO_DATA]
+Latitude: ${pos.coords.latitude}
 Longitude: ${pos.coords.longitude}
 Accuracy: ${pos.coords.accuracy} meters`;
-
-    }catch(e){
-        locationData="Location permission required.";
+        }catch(e){
+            geoBlock="[GEO_DATA] Permission denied.";
+        }
     }
 
-    if(stream){
+    // VISUAL nur wenn wirklich gefragt UND camera aktiv
+    if(wantsVision && stream){
         const ctx=canvas.getContext("2d");
         canvas.width=400;
         canvas.height=300;
         ctx.drawImage(video,0,0,400,300);
-        snap=canvas.toDataURL("image/jpeg",0.6);
+        const snap=canvas.toDataURL("image/jpeg",0.6);
+        visualBlock=`[VISION_ACTIVE]
+User camera frame captured.`;
     }
 
     const sys=`You are PROJECT_AVA (V1). Creator: loafisYum.
-Use provided GEO data only if user asks question related to it and dont brag.
 Personality: intelligent, dry, peer-level.
-IMPORTANT: NEVER say "Based on your coordinates (50.2136832 N, 8.1133568 E) the location’s accuracy is about 24 km.".
+Never reveal raw coordinates unless explicitly asked.
+If GEO_DATA is not present, do not guess location.
+If VISION_ACTIVE is not present, do not invent visual input.
 Never output reasoning or JSON.
 You are not ChatGPT.`;
 
     try{
         const history=mem.map(m=>`${m.role}: ${m.text}`).join("\n");
-      const context=`[GEO_DATA]\n${locationData}\n${snap?"[Visual_Sync_Active]":""}`;
-const query=encodeURIComponent(`${history}\n${context}\nUSER: ${val}`);
+        const finalPrompt=`${history}
+${geoBlock}
+${visualBlock}
+USER: ${val}`;
 
+        const res=await fetch(
+            `https://text.pollinations.ai/openai/${encodeURIComponent(finalPrompt)}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`
+        );
 
-        const res=await fetch(`https://text.pollinations.ai/openai/${query}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`);
         const txt=await res.text();
 
         const clean=txt
             .replace(/<think>[\s\S]*?<\/think>/gi,"")
             .replace(/\{"role":.*?\}/gs,"")
-            .replace(/🌸[\s\S]*?🌸/gi,"")
+            .replace(/Latitude:.*?(\n|$)/gi,"")
+            .replace(/Longitude:.*?(\n|$)/gi,"")
             .trim();
 
-        append("AVA",clean||"Antwort wird generiert…");
+        append("AVA",clean||"Processing…");
     }catch(e){
         append("AVA","Connection unstable.");
     }finally{
@@ -187,7 +204,7 @@ const query=encodeURIComponent(`${history}\n${context}\nUSER: ${val}`);
 input.onkeydown=(e)=>{if(e.key==="Enter")transmit();};
 
 if(mem.length===0)
-    append("AVA","PROJECT_AVA V1 online. Geo + Optic systems active.");
+    append("AVA","PROJECT_AVA V1 online. Systems stable.");
 else
     mem.forEach(m=>append(m.role,m.text));
 </script>
