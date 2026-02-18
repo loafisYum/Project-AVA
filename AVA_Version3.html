@@ -3,89 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROJECT_AVA // V1</title>
+<title>PROJECT_AVA // Llama 1B</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #020203;
-  --accent: #00ffa3;
-  --panel: #0a0a0c;
-  --border: #121214;
-  --text: #d1d1d1;
-  --error: #ff3366;
-  --glow: #00ffa340;
+:root{
+  --bg:#020203;--accent:#00ffa3;--panel:#0a0a0c;--border:#121214;--text:#d1d1d1;--glow:#00ffa340;
 }
-*{box-sizing:border-box;margin:0;padding:0;cursor:crosshair;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Outfit',sans-serif;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  position:relative;
-}
-header{
-  padding:22px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  z-index:10;
-}
-.logo{
-  font-family:'JetBrains Mono';
-  font-weight:700;
-  letter-spacing:12px;
-  font-size:1.15rem;
-  color:var(--accent);
-  text-shadow:0 0 20px var(--glow);
-}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;margin:0;}
+header{padding:22px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--panel);border-bottom:1px solid var(--border);z-index:10;}
+.logo{font-family:'JetBrains Mono';font-weight:700;letter-spacing:12px;font-size:1.15rem;color:var(--accent);text-shadow:0 0 20px var(--glow);}
 .tag{font-size:0.65rem;opacity:0.45;font-family:'JetBrains Mono';letter-spacing:3px;}
-.burger{
-  width:30px;height:20px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;
-}
-.burger span{
-  display:block;height:4px;background:var(--accent);border-radius:2px;transition:0.3s;
-}
+.burger{width:30px;height:20px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;}
+.burger span{display:block;height:4px;background:var(--accent);border-radius:2px;transition:0.3s;}
 .burger.active span:nth-child(1){transform:rotate(45deg) translateY(8px);}
 .burger.active span:nth-child(2){opacity:0;}
 .burger.active span:nth-child(3){transform:rotate(-45deg) translateY(-8px);}
-
-#model-menu{
-  position:fixed;top:0;left:-300px;width:300px;height:100%;background:var(--panel);
-  border-right:1px solid var(--border);padding:30px;display:flex;flex-direction:column;gap:25px;transition:0.4s;z-index:9999;
-}
+#model-menu{position:fixed;top:0;left:-300px;width:300px;height:100%;background:var(--panel);border-right:1px solid var(--border);padding:30px;display:flex;flex-direction:column;gap:25px;transition:0.4s;z-index:9999;}
 #model-menu.active{left:0;}
-.model-card{
-  background:var(--panel);border:2px solid var(--border);border-radius:20px;
-  padding:20px;text-align:center;cursor:pointer;transition:0.3s;
-}
+.model-card{background:var(--panel);border:2px solid var(--border);border-radius:20px;padding:20px;text-align:center;cursor:pointer;transition:0.3s;}
 .model-card:hover{border-color:var(--accent);box-shadow:0 0 40px var(--glow);}
 .model-card h3{color:var(--accent);margin-bottom:8px;}
 .model-card .size{color:#00ffa380;margin-bottom:6px;}
-.model-card button{
-  background:transparent;border:2px solid var(--accent);color:var(--accent);padding:8px 22px;border-radius:999px;cursor:pointer;
-}
+.model-card button{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:8px 22px;border-radius:999px;cursor:pointer;}
 .model-card button:hover{background:var(--accent);color:#000;box-shadow:0 0 30px var(--glow);}
-
 #viewport{flex:1 1 auto;overflow-y:auto;padding:20px;scroll-behavior:smooth;}
 .msg{margin-bottom:25px;}
 .role{font-family:'JetBrains Mono';font-size:0.7rem;color:var(--accent);margin-bottom:3px;font-weight:700;}
 .content{font-size:1.1rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
-
-.input-area{
-  padding:15px 20px;background:var(--panel);border-top:1px solid var(--border);
-}
+.input-area{padding:15px 20px;background:var(--panel);border-top:1px solid var(--border);}
 .bar{display:flex;gap:15px;align-items:center;}
-input{
-  flex:1;background:transparent;border:none;color:#fff;font-size:1.1rem;outline:none;font-weight:300;
-}
-#send-btn{
-  background:transparent;border:2px solid var(--accent);color:var(--accent);padding:10px 22px;border-radius:999px;cursor:pointer;
-}
+input{flex:1;background:transparent;border:none;color:#fff;font-size:1.1rem;outline:none;font-weight:300;}
+#send-btn{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:10px 22px;border-radius:999px;cursor:pointer;}
 #send-btn:hover{background:var(--accent);color:#000;box-shadow:0 0 35px var(--glow);}
 #send-btn:disabled{opacity:0.4;cursor:not-allowed;}
 </style>
@@ -95,23 +43,18 @@ input{
 <header>
   <div class="logo">PROJECT_AVA</div>
   <div style="display:flex;align-items:center;gap:15px;">
-    <div class="tag">BUILD: V1</div>
-    <div class="burger" id="burger">
-      <span></span><span></span><span></span>
-    </div>
+    <div class="tag">V1_Llama</div>
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
   </div>
 </header>
 
 <div id="model-menu">
   <h2 style="color:var(--accent);letter-spacing:2px;">SELECT CORE</h2>
-  <div class="model-card" onclick="selectModel('Xenova/gpt2')">
-    <h3>ULTRA LIGHT</h3><div class="size">0.55 GB</div><div class="desc">Fast & tiny</div><button>ACTIVATE</button>
-  </div>
-  <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-0.5B-Instruct-ONNX')">
-    <h3>LIGHTWEIGHT</h3><div class="size">0.9 GB</div><div class="desc">Daily driver</div><button>ACTIVATE</button>
-  </div>
-  <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-1.5B-Instruct-ONNX')">
-    <h3>GOLDEN MIDDLE ★</h3><div class="size">1.6 GB</div><div class="desc">Recommended</div><button>ACTIVATE</button>
+  <div class="model-card" onclick="selectModel('onnx-community/Llama-3.2-1B-Instruct-ONNX')">
+    <h3>LLAMA 1B</h3>
+    <div class="size">1.0 GB</div>
+    <div class="desc">Smart Project_AVA core</div>
+    <button>ACTIVATE</button>
   </div>
 </div>
 
@@ -141,74 +84,59 @@ let generator = null;
 let chosenModel = null;
 let mem = JSON.parse(localStorage.getItem("AVA_V1_MEM") || "[]");
 
-// burger menu toggle
-burger.onclick = ()=>{
-  burger.classList.toggle("active");
-  modelMenu.classList.toggle("active");
-};
+// burger toggle
+burger.onclick = ()=>{burger.classList.toggle("active");modelMenu.classList.toggle("active");};
 
 // append message
-function append(role, text){
-  if(!text.trim()) return;
-  const msg = document.createElement("div");
-  msg.className = "msg";
-  msg.innerHTML = `<div class="role">${role}</div><div class="content">${text}</div>`;
-  viewport.appendChild(msg);
-  viewport.scrollTop = viewport.scrollHeight;
-}
+function append(role,text){if(!text.trim())return;const msg=document.createElement("div");msg.className="msg";msg.innerHTML=`<div class="role">${role}</div><div class="content">${text}</div>`;viewport.appendChild(msg);viewport.scrollTop=viewport.scrollHeight;return msg;}
 
-// select a model
-window.selectModel = async (model) => {
-  chosenModel = model;
-  modelMenu.classList.remove("active");
-  burger.classList.remove("active");
-  append("AVA", `Loading core ${model.split('/').pop()}…`);
-  sendBtn.disabled = true;
-  try {
-    generator = await pipeline('text-generation', chosenModel, {
-      quantized:true,
-      progress_callback:(data)=>{
-        // optional: handle progress
-      }
-    });
-    append("AVA", `Core ${chosenModel.split('/').pop()} active.`);
-    sendBtn.disabled = false;
-  } catch(e){
-    console.error(e);
-    append("AVA", "Initialization failed. Use ULTRA LIGHT core if browser lags.");
-  }
+// select model
+window.selectModel=async(model)=>{
+  chosenModel=model;
+  modelMenu.classList.remove("active");burger.classList.remove("active");
+  append("AVA",`Loading core ${model.split('/').pop()}…`);
+  sendBtn.disabled=true;
+  try{
+    generator=await pipeline('text-generation',chosenModel,{quantized:true});
+    append("AVA",`Core ${chosenModel.split('/').pop()} active. Project_AVA personality loaded.`);
+    sendBtn.disabled=false;
+  }catch(e){console.error(e);append("AVA","Initialization failed. Try again.");}
 };
 
-// send a message
+// send message with streaming
 async function sendMessage(){
-  const val = input.value.trim();
-  if(!val || !generator) return;
-  input.value = "";
-  append("USER", val);
+  const val=input.value.trim();
+  if(!val||!generator)return;
+  input.value="";
+  append("USER",val);
   mem.push({role:"USER",text:val});
-  sendBtn.disabled = true;
+  sendBtn.disabled=true;
 
+  const systemPrompt=`You are PROJECT_AVA (V1, Llama 1B). Intelligent, dry, peer-level. Local only. Use logic and reasoning. Respond as Project_AVA.`;
+  
   try{
-    const out = await generator(val,{max_new_tokens:256,do_sample:true,temperature:0.7,return_full_text:false});
-    const resp = out.generated_text?.trim() || "No response.";
-    append("AVA", resp);
-    mem.push({role:"AVA",text:resp});
-    if(mem.length>15) mem.shift();
+    const lastMsg=append("AVA",""); // placeholder for streaming
+    const out=await generator(
+      [{role:"system",content:systemPrompt},{role:"user",content:val}],
+      {
+        max_new_tokens:256,
+        do_sample:true,
+        temperature:0.7,
+        return_full_text:false,
+        stream_callback: token=>{lastMsg.querySelector(".content").textContent+=token;}
+      }
+    );
+    mem.push({role:"AVA",text:lastMsg.querySelector(".content").textContent});
+    if(mem.length>15)mem.shift();
     localStorage.setItem("AVA_V1_MEM",JSON.stringify(mem));
-  } catch(e){
-    console.error(e);
-    append("AVA", "Inference error.");
-  } finally {
-    sendBtn.disabled = false;
-  }
+  }catch(e){console.error(e);append("AVA","Inference error.");}finally{sendBtn.disabled=false;}
 }
 
-sendBtn.onclick = sendMessage;
-input.addEventListener("keydown", e=>{ if(e.key==="Enter") sendMessage(); });
+sendBtn.onclick=sendMessage;
+input.addEventListener("keydown",e=>{if(e.key==="Enter")sendMessage();});
 
 // restore previous session
-mem.forEach(m=>append(m.role==='AVA'?'AVA':'USER', m.text));
+mem.forEach(m=>append(m.role==='AVA'?'AVA':'USER',m.text));
 </script>
-
 </body>
 </html>
