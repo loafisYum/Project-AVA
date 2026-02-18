@@ -43,10 +43,10 @@ input{flex:1;background:transparent;border:none;color:#fff;font-size:1.1rem;outl
 const viewport = document.getElementById("viewport");
 const inputEl = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
-const POLLI_URL = "https://text.pollinations.ai/openai";
+const PROXY_URL = "http://localhost:3000/api/chat";
 
-// append chat bubble
-function append(role,text){
+// Append message to chat
+function append(role, text){
   if(!text) return;
   const msg = document.createElement("div");
   msg.className = "msg";
@@ -56,7 +56,7 @@ function append(role,text){
   return msg;
 }
 
-// send message
+// Send message
 async function sendMessage(){
   const val = inputEl.value.trim();
   if(!val) return;
@@ -65,12 +65,13 @@ async function sendMessage(){
   sendBtn.disabled = true;
 
   const systemPrompt = `
-You are PROJECT_AVA (V1.2). Intelligent, dry, peer-level.
-Answer like Project_AVA. Be logical and concise.
-  `;
+You are PROJECT_AVA (V1.2).
+Intelligent, dry, peer-level.
+Answer like Project_AVA. Be logical, concise, and project confidence.
+`;
 
   try {
-    const response = await fetch(POLLI_URL, {
+    const response = await fetch(PROXY_URL, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
@@ -100,10 +101,11 @@ Answer like Project_AVA. Be logical and concise.
   }
 }
 
+// Event listeners
 sendBtn.onclick = sendMessage;
 inputEl.addEventListener("keydown", e => { if(e.key==="Enter") sendMessage(); });
 
-// initial greeting
+// Initial greeting
 append("PROJECT_AVA","Project_AVA V1.2 online. Ask me anything.");
 </script>
 
