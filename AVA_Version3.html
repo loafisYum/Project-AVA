@@ -364,7 +364,6 @@ input{
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-// 1. Core Configuration
 env.allowLocalModels = false;
 env.allowRemoteModels = true;
 env.cacheDir = 'project_ava_cache';
@@ -390,14 +389,9 @@ function setProgress(pct, txt = "") {
   if (txt) detail.textContent = txt;
 }
 
-// FIX: Functions must be attached to 'window' to work with HTML 'onclick'
-window.selectModel = (repo) => {
+window.selectModel = async (repo) => {
   chosenRepo = repo;
   document.getElementById('model-selection').style.display = 'none';
-  initModel();
-};
-
-async function initModel() {
   loadingScreen.classList.add('active');
   setProgress(5, "Initializing sovereign core…");
   try {
@@ -414,16 +408,14 @@ async function initModel() {
     setTimeout(() => {
       loadingScreen.classList.remove('active');
       sendBtn.disabled = false;
-      if (mem.length === 0) {
-          append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded.`);
-      }
+      if (mem.length === 0) append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
     }, 900);
   } catch (err) {
     console.error(err);
     detail.style.color = 'var(--error)';
-    detail.textContent = "Initialization failed.";
+    detail.textContent = "Initialization failed. Try a smaller core.";
   }
-}
+};
 
 window.opticLink = async () => {
   if (!stream) {
@@ -432,92 +424,70 @@ window.opticLink = async () => {
       video.srcObject = stream;
       stage.style.display = "block";
       eyeBtn.classList.add("active");
-    } catch (e) { append("AVA", "Camera denied."); }
+      append("AVA", "Optic Link activated.");
+    } catch (e) {
+      append("AVA", "Camera permission denied.");
+    }
   } else {
     stream.getTracks().forEach(t => t.stop());
     stream = null;
     stage.style.display = "none";
     eyeBtn.classList.remove("active");
+    append("AVA", "Optic Link deactivated.");
   }
 };
 
 window.purge = () => {
-  if (!confirm("PURGE ALL MEMORY?")) return;
+  if (!confirm("PURGE ALL MEMORY AND CACHE?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
+  mem = [];
+  flow.innerHTML = "";
   location.reload();
 };
 
 function append(role, text) {
-  if (!text) return;
+  if (!text || !text.trim()) return;
   const d = document.createElement("div");
   d.className = "msg";
   const safe = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   d.innerHTML = `<div class="role">${role === 'AVA' ? 'PROJECT_AVA' : 'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
-  const vp = document.getElementById('viewport');
-  vp.scrollTop = vp.scrollHeight;
+  flow.scrollTop = flow.scrollHeight;
   return d;
 }
 
-// FIX: Explicitly attached to window and added 'return_full_text: false'
 window.transmit = async () => {
   if (!generator || sendBtn.disabled) return;
   const val = input.value.trim();
   if (!val) return;
-  
   input.value = "";
   append("USER", val);
   mem.push({ role: "USER", text: val });
-  
-  sendBtn.disabled = true;
-  const sys = `You are PROJECT_AVA (V1). Personality: intelligent, dry. You are a local AI.`;
 
-  const messages = [
-    { role: "system", content: sys },
-    ...mem.map(m => ({ role: m.role === "AVA" ? "assistant" : "user", content: m.text })),
-    { role: "user", content: val }
-  ];
+  sendBtn.disabled = true;
 
   try {
     const last = append("AVA", "Thinking …");
-    
-    const out = await generator(messages, { 
-        max_new_tokens: 512, 
-        do_sample: true, 
-        temperature: 0.7,
-        return_full_text: false // Stops AVA from repeating the user prompt
-    });
-
-    let resp = out[0].generated_text.trim();
+    const out = await generator(val, { max_new_tokens: 512, do_sample: true, temperature: 0.7, return_full_text: false });
+    const resp = out.generated_text?.trim() || "No response generated.";
     last.querySelector(".content").textContent = resp;
-    
     mem.push({ role: "AVA", text: resp });
     if (mem.length > 15) mem.shift();
     localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
-
   } catch (e) {
     console.error(e);
-    append("AVA", "Inference error.");
+    append("AVA", "Inference error. Core might be overloaded.");
   } finally {
     sendBtn.disabled = false;
   }
 };
 
-// FIX: Properly handle the Enter key
-input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        window.transmit();
-    }
-});
+input.onkeydown = e => { if (e.key === "Enter") transmit(); };
 
-// Restore session
-if (mem.length > 0) {
-  mem.forEach(m => append(m.role, m.text));
-} else {
-  append("AVA", "PROJECT_AVA V1 ready. Choose your core.");
-}
+if (mem.length > 0) mem.forEach(m => append(m.role, m.text));
+else append("AVA", "PROJECT_AVA V1 ready. Choose your core to begin.");
 </script>
+
 </body>
 </html>
