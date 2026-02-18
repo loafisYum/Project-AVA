@@ -3,179 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AVA Interface</title>
+    <title>PROJECT AVA</title>
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --sidebar-bg: #252525;
-            --accent-color: #3f51b5;
-            --text-color: #ffffff;
+            --bg: #0f0f0f;
+            --panel: #1a1a1a;
+            --accent: #00ff9d; /* AVA Signature Green */
+            --text: #e0e0e0;
+            --ghost: #333;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* Sidebar / Burger Menu */
+        /* Burger Menu Logic */
         #sidebar {
+            width: 280px;
+            background: var(--panel);
+            border-right: 1px solid var(--ghost);
             position: fixed;
-            left: -250px;
-            width: 250px;
             height: 100%;
-            background-color: var(--sidebar-bg);
-            transition: 0.3s;
-            z-index: 1000;
+            left: -280px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
             padding: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
         }
 
-        #sidebar.active {
-            left: 0;
-        }
+        #sidebar.open { left: 0; }
 
-        /* Burger Button */
-        .burger-btn {
+        .burger-icon {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 20px;
+            left: 20px;
+            z-index: 101;
             cursor: pointer;
-            z-index: 1001;
-            background: var(--accent-color);
-            border: none;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
+            font-size: 24px;
+            color: var(--accent);
+            background: var(--panel);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--ghost);
         }
 
-        /* Chat Container */
-        #chat-container {
+        /* Model Selection Styling */
+        .model-list {
+            margin-top: 60px;
+        }
+
+        .model-option {
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--ghost);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .model-option:hover { border-color: var(--accent); }
+        .model-option.active {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Main Chat Area */
+        #main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            padding-top: 60px; /* Space for burger */
-            width: 100%;
+            align-items: center;
+            padding-top: 80px;
+            transition: margin-left 0.3s;
         }
 
-        #chat-window {
+        #chat-log {
+            width: 90%;
+            max-width: 800px;
             flex: 1;
             overflow-y: auto;
-            border: 1px solid #444;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            background: #222;
+            padding-bottom: 20px;
         }
 
-        .input-area {
+        .input-box {
+            width: 90%;
+            max-width: 800px;
+            background: var(--panel);
+            border: 1px solid var(--ghost);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 30px;
             display: flex;
             gap: 10px;
         }
 
         input {
             flex: 1;
-            padding: 12px;
-            border-radius: 5px;
-            border: none;
-            background: #333;
-            color: white;
-        }
-
-        button.send-btn {
-            padding: 10px 20px;
-            background: var(--accent-color);
+            background: transparent;
             border: none;
             color: white;
-            border-radius: 5px;
-            cursor: pointer;
+            outline: none;
+            font-size: 16px;
         }
 
-        /* Model Selector Styling */
-        .model-select {
-            margin-top: 50px;
+        .msg { margin-bottom: 20px; line-height: 1.5; }
+        .msg.user { color: #888; }
+        .msg.ava { color: var(--text); }
+        .model-tag { 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            background: var(--ghost); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            margin-right: 8px;
         }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            background: #444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-
-        .message { margin-bottom: 10px; }
-        .user-msg { color: #81d4fa; }
-        .ava-msg { color: #a5d6a7; }
     </style>
 </head>
 <body>
 
+    <div class="burger-icon" onclick="toggleMenu()">☰</div>
+
     <div id="sidebar">
-        <h3>Settings</h3>
-        <div class="model-select">
-            <label for="model">Select Model:</label>
-            <select id="model-selector">
-                <option value="ava-flash">AVA Flash</option>
-                <option value="ava-pro">AVA Pro</option>
-                <option value="ava-ultra">AVA Ultra</option>
-            </select>
+        <h3>PROJECT AVA</h3>
+        <p style="font-size: 12px; color: #666;">Select Active Engine:</p>
+        <div class="model-list">
+            <div class="model-option active" onclick="setModel('AVA-1', this)">AVA-1 (Fast)</div>
+            <div class="model-option" onclick="setModel('AVA-2', this)">AVA-2 (Creative)</div>
+            <div class="model-option" onclick="setModel('AVA-Ultra', this)">AVA-Ultra (Reasoning)</div>
         </div>
-        <p style="font-size: 0.8em; margin-top: 20px; color: #888;">Project AVA v1.0</p>
     </div>
 
-    <button class="burger-btn" onclick="toggleMenu()">☰ Menu</button>
-
-    <div id="chat-container">
-        <div id="chat-window">
-            <div class="message ava-msg">System: PROJECT AVA initialized. Select your model in the menu.</div>
+    <div id="main">
+        <div id="chat-log">
+            <div class="msg ava">System: All modules online. PROJECT AVA ready.</div>
         </div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button class="send-btn" onclick="sendMessage()">Send</button>
+        <div class="input-box">
+            <input type="text" id="userInput" placeholder="Ask AVA anything..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" style="background: none; border: none; color: var(--accent); cursor: pointer; font-weight: bold;">SEND</button>
         </div>
     </div>
 
     <script>
-        const sidebar = document.getElementById('sidebar');
-        const chatWindow = document.getElementById('chat-window');
-        const userInput = document.getElementById('user-input');
-        const modelSelector = document.getElementById('model-selector');
+        let currentModel = 'AVA-1';
 
         function toggleMenu() {
-            sidebar.classList.toggle('active');
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        function setModel(modelName, element) {
+            currentModel = modelName;
+            
+            // UI update for selection
+            document.querySelectorAll('.model-option').forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+            
+            // Log the change
+            const log = document.getElementById('chat-log');
+            log.innerHTML += `<div class="msg ava" style="font-size: 12px; opacity: 0.6;">System: Switched to ${modelName}</div>`;
+            log.scrollTop = log.scrollHeight;
+            
+            toggleMenu(); // Close menu after selection
         }
 
         function sendMessage() {
-            const text = userInput.value;
-            const model = modelSelector.value;
-            if (!text) return;
-
-            // Display User Message
-            chatWindow.innerHTML += `<div class="message user-msg"><b>You:</b> ${text}</div>`;
+            const input = document.getElementById('userInput');
+            const log = document.getElementById('chat-log');
             
-            // Clear input
-            userInput.value = '';
+            if (input.value.trim() === "") return;
 
-            // Simulate Response (This is where you'd call your API)
+            // User Message
+            log.innerHTML += `<div class="msg user"><b>You:</b> ${input.value}</div>`;
+            
+            const userText = input.value;
+            input.value = "";
+
+            // AVA Response (using the selected model)
             setTimeout(() => {
-                chatWindow.innerHTML += `<div class="message ava-msg"><b>AVA (${model}):</b> I received your message.</div>`;
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-            }, 500);
+                log.innerHTML += `
+                    <div class="msg ava">
+                        <span class="model-tag">${currentModel}</span>
+                        ${getResponse(userText)}
+                    </div>`;
+                log.scrollTop = log.scrollHeight;
+            }, 600);
         }
 
-        // Close menu if clicking outside
-        document.addEventListener('click', (e) => {
-            if (!sidebar.contains(e.target) && !e.target.classList.contains('burger-btn') && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
+        function getResponse(text) {
+            // This logic now respects the model choice
+            if (currentModel === 'AVA-Ultra') {
+                return "Analyzing request with high-precision logic... Processing complete.";
+            } else if (currentModel === 'AVA-2') {
+                return "Generating a creative synthesis based on your input.";
             }
-        });
+            return "Task received. Executing standard protocols.";
+        }
     </script>
 </body>
 </html>
