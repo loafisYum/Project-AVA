@@ -1,235 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PROJECT_AVA // V1</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #020203;
-      --accent: #00ffa3;
-      --panel: #0a0a0c;
-      --border: #121214;
-      --text: #d1d1d1;
-      --error: #ff3366;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; cursor:crosshair; }
-    body {
-      background:var(--bg);
-      color:var(--text);
-      font-family:'Outfit',sans-serif;
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
-    header {
-      padding:20px 40px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      background:var(--panel);
-      border-bottom:1px solid var(--border);
-    }
-    .logo {
-      font-family:'JetBrains Mono';
-      font-weight:700;
-      letter-spacing:10px;
-      font-size:1rem;
-      color:var(--accent);
-    }
-    .tag { font-size:0.6rem; opacity:0.4; font-family:'JetBrains Mono'; letter-spacing:2px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT_AVA // V1</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#020203; --accent:#00ffa3; --panel:#0a0a0c; --border:#121214; --text:#d1d1d1; --error:#ff3366; }
+*{box-sizing:border-box;margin:0;padding:0;cursor:crosshair;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+header{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:var(--panel);border-bottom:1px solid var(--border);}
+.logo{font-family:'JetBrains Mono';font-weight:700;letter-spacing:10px;font-size:1rem;color:var(--accent);}
+.tag{font-size:0.6rem;opacity:0.4;font-family:'JetBrains Mono';letter-spacing:2px;}
+#features{background:#040405;padding:10px 40px;display:flex;gap:20px;border-bottom:1px solid var(--border);}
+.f-btn{background:transparent;border:1px solid #1a1a1c;color:#555;padding:6px 16px;border-radius:100px;font-family:'JetBrains Mono';font-size:0.6rem;transition:0.3s;cursor:pointer;}
+.f-btn:hover{color:var(--accent);border-color:var(--accent);}
+.f-btn.active{background:var(--accent);color:#000;border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,163,0.15);}
+#viewport{flex:1;overflow-y:auto;padding:40px;scroll-behavior:smooth;position:relative;}
+.container{max-width:800px;margin:0 auto;}
+#cam-stage{display:none;width:100%;aspect-ratio:16/9;background:#000;border-radius:15px;margin-bottom:40px;border:1px solid var(--border);overflow:hidden;}
+video{width:100%;height:100%;object-fit:cover;opacity:0.95;}
+.msg{margin-bottom:40px;animation:slideUp 0.5s cubic-bezier(0,0,0.2,1);}
+.role{font-family:'JetBrains Mono';font-size:0.65rem;color:var(--accent);margin-bottom:10px;letter-spacing:4px;font-weight:700;}
+.content{font-size:1.15rem;line-height:1.75;font-weight:300;white-space:pre-wrap;word-break:break-word;}
+.input-area{padding:40px;background:var(--panel);border-top:1px solid var(--border);}
+.bar{max-width:800px;margin:0 auto;display:flex;gap:25px;align-items:center;}
+input{flex:1;background:transparent;border:none;color:#fff;font-size:1.2rem;outline:none;font-weight:300;}
+#s{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:10px 30px;border-radius:100px;font-family:'JetBrains Mono';font-size:0.8rem;font-weight:700;transition:0.3s;cursor:pointer;}
+#s:hover:not(:disabled){background:var(--accent);color:#000;}
+#s:disabled{opacity:0.4;cursor:wait;}
 
-    #features {
-      background:#040405;
-      padding:10px 40px;
-      display:flex;
-      gap:20px;
-      border-bottom:1px solid var(--border);
-    }
-    .f-btn {
-      background:transparent;
-      border:1px solid #1a1a1c;
-      color:#555;
-      padding:6px 16px;
-      border-radius:100px;
-      font-family:'JetBrains Mono';
-      font-size:0.6rem;
-      transition:0.3s;
-      cursor:pointer;
-    }
-    .f-btn:hover { color:var(--accent); border-color:var(--accent); }
-    .f-btn.active {
-      background:var(--accent);
-      color:#000;
-      border-color:var(--accent);
-      box-shadow:0 0 20px rgba(0,255,163,0.18);
-    }
+/* Loading overlay */
+#loading-screen{position:fixed;inset:0;background:rgba(2,2,3,0.96);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;font-family:'JetBrains Mono';color:var(--accent);}
+#loading-screen.hidden{display:none;}
+.progress-container{width:60%;max-width:500px;height:12px;background:#111;border:1px solid #222;border-radius:6px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg, #00ffa3, #00c896);transition:width 0.2s ease-out;}
+.status{font-size:1.1rem;letter-spacing:1px;}
+.detail{font-size:0.9rem;opacity:0.7;max-width:500px;text-align:center;line-height:1.5;}
 
-    #viewport {
-      flex:1;
-      overflow-y:auto;
-      padding:40px;
-      scroll-behavior:smooth;
-      position:relative;
-    }
-    .container { max-width:800px; margin:0 auto; }
-
-    #cam-stage {
-      display:none;
-      width:100%;
-      aspect-ratio:16/9;
-      background:#000;
-      border-radius:15px;
-      margin-bottom:40px;
-      border:1px solid var(--border);
-      overflow:hidden;
-    }
-    video { width:100%; height:100%; object-fit:cover; opacity:0.95; }
-
-    .msg {
-      margin-bottom:40px;
-      animation:slideUp 0.5s cubic-bezier(0,0,0.2,1);
-    }
-    .role {
-      font-family:'JetBrains Mono';
-      font-size:0.65rem;
-      color:var(--accent);
-      margin-bottom:10px;
-      letter-spacing:4px;
-      font-weight:700;
-    }
-    .content {
-      font-size:1.15rem;
-      line-height:1.75;
-      font-weight:300;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-
-    .input-area {
-      padding:40px;
-      background:var(--panel);
-      border-top:1px solid var(--border);
-    }
-    .bar {
-      max-width:800px;
-      margin:0 auto;
-      display:flex;
-      gap:25px;
-      align-items:center;
-    }
-    input {
-      flex:1;
-      background:transparent;
-      border:none;
-      color:#fff;
-      font-size:1.2rem;
-      outline:none;
-      font-weight:300;
-    }
-    #s {
-      background:transparent;
-      border:1px solid var(--accent);
-      color:var(--accent);
-      padding:10px 30px;
-      border-radius:100px;
-      font-family:'JetBrains Mono';
-      font-size:0.8rem;
-      font-weight:700;
-      transition:0.3s;
-      cursor:pointer;
-    }
-    #s:hover:not(:disabled) {
-      background:var(--accent);
-      color:#000;
-    }
-    #s:disabled { opacity:0.4; cursor:wait; }
-
-    /* ── Loading overlay ──────────────────────────────────────── */
-    #loading-screen {
-      position:fixed;
-      inset:0;
-      background:rgba(2,2,3,0.96);
-      z-index:9999;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      gap:30px;
-      font-family:'JetBrains Mono';
-      color:var(--accent);
-    }
-    #loading-screen.hidden { display:none; }
-    .progress-container {
-      width:60%;
-      max-width:500px;
-      height:12px;
-      background:#111;
-      border:1px solid #222;
-      border-radius:6px;
-      overflow:hidden;
-    }
-    .progress-bar {
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, #00ffa3, #00c896);
-      transition:width 0.2s ease-out;
-    }
-    .status {
-      font-size:1.1rem;
-      letter-spacing:1px;
-    }
-    .detail {
-      font-size:0.9rem;
-      opacity:0.7;
-      max-width:500px;
-      text-align:center;
-      line-height:1.5;
-    }
-
-    @keyframes slideUp {
-      from { opacity:0; transform:translateY(24px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-  </style>
+@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+</style>
 </head>
 <body>
 
 <header>
-  <div class="logo">PROJECT_AVA</div>
-  <div class="tag">BUILD: V1_SOVEREIGN_LOCAL</div>
+<div class="logo">PROJECT_AVA</div>
+<div class="tag">BUILD: V1_SOVEREIGN_LOCAL</div>
 </header>
 
 <div id="features">
-  <button class="f-btn" id="eye" onclick="opticLink()">[ OPTIC_LINK ]</button>
-  <button class="f-btn" onclick="purge()">[ SECURE_WIPE ]</button>
+<button class="f-btn" id="eye" onclick="opticLink()">[ OPTIC_LINK ]</button>
+<button class="f-btn" onclick="purge()">[ SECURE_WIPE ]</button>
 </div>
 
 <div id="viewport">
-  <div class="container">
-    <div id="cam-stage"><video id="v" autoplay playsinline muted></video></div>
-    <div id="flow"></div>
-  </div>
+<div class="container">
+<div id="cam-stage"><video id="v" autoplay playsinline muted></video></div>
+<div id="flow"></div>
+</div>
 </div>
 
 <canvas id="c" style="display:none;"></canvas>
 
 <div class="input-area">
-  <div class="bar">
-    <input type="text" id="i" placeholder="Handshake awaiting..." autocomplete="off">
-    <button id="s" onclick="transmit()" disabled>SEND</button>
-  </div>
+<div class="bar">
+<input type="text" id="i" placeholder="Handshake awaiting..." autocomplete="off">
+<button id="s" onclick="transmit()" disabled>SEND</button>
+</div>
 </div>
 
 <div id="loading-screen">
-  <div class="status">Sorry for the inconvenience</div>
-  <div class="status">Downloading local inference model (Phi-3.5-mini-instruct Q4) …</div>
-  <div class="progress-container">
-    <div class="progress-bar" id="prog"></div>
-  </div>
-  <div class="detail" id="detail">This is a one-time ~2.4 GB download. Model will be cached in your browser.</div>
+<div class="status">Sorry for the inconvenience, we are currently downloading the model for you</div>
+<div class="progress-container"><div class="progress-bar" id="prog"></div></div>
+<div class="detail" id="detail">One-time download (~1.4–1.8 GB) – Qwen2.5-1.5B-Instruct will be cached locally in your browser.</div>
 </div>
 
 <script type="module">
@@ -237,7 +80,7 @@ import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers
 
 env.allowLocalModels = false;
 env.allowRemoteModels = true;
-env.cacheDir = 'project_ava_cache';   // wird im IndexedDB gespeichert
+env.cacheDir = 'project_ava_cache';
 
 const flow = document.getElementById('flow');
 const input = document.getElementById('i');
@@ -265,31 +108,31 @@ async function initModel() {
 
     generator = await pipeline(
       'text-generation',
-      'Xenova/Phi-3.5-mini-instruct',
+      'onnx-community/Qwen2.5-1.5B-Instruct-ONNX',
       {
         quantized: true,
         progress_callback: (data) => {
-          if (data.status === 'progress') {
+          if (data.status === 'progress' && data.file) {
             const pct = Math.round((data.loaded / data.total) * 100);
-            setProgress(pct, `Downloading weights… ${pct}%`);
+            setProgress(pct, `Downloading model files … ${pct}%`);
           } else if (data.status === 'ready') {
-            setProgress(100, "Model loaded into memory");
+            setProgress(100, "Model loaded – ready for sovereign inference");
           }
         }
       }
     );
 
-    setProgress(100, "Model ready. Starting interface…");
+    setProgress(100, "Local inference engine ready");
     setTimeout(() => {
       loadingScreen.classList.add('hidden');
       sendBtn.disabled = false;
-      append("AVA", "PROJECT_AVA V1 (local) online. Systems nominal.");
+      append("AVA", "PROJECT_AVA V1 local online. Qwen2.5-1.5B-Instruct geladen. Keine Cloud, keine Anmeldung.");
     }, 800);
 
   } catch (err) {
     console.error(err);
     detail.style.color = 'var(--error)';
-    detail.textContent = "Model download failed: " + (err.message || "unknown error");
+    detail.textContent = "Model konnte nicht geladen werden: " + (err.message || "Unbekannter Fehler");
     setProgress(0);
   }
 }
@@ -297,10 +140,7 @@ async function initModel() {
 async function opticLink() {
   if (!stream) {
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false
-      });
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
       video.srcObject = stream;
       stage.style.display = "block";
       eyeBtn.classList.add("active");
@@ -318,7 +158,7 @@ async function opticLink() {
 }
 
 function purge() {
-  if (!confirm("Really purge all memory and cache?")) return;
+  if (!confirm("Wirklich alle Daten und Cache löschen?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
   mem = [];
@@ -331,9 +171,7 @@ function append(role, text) {
   const d = document.createElement("div");
   d.className = "msg";
   const safe = text.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  d.innerHTML = `
-    <div class="role">${role==='AVA' ? 'PROJECT_AVA' : 'USER'}</div>
-    <div class="content">${safe}</div>`;
+  d.innerHTML = `<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
   document.getElementById('viewport').scrollTop = document.getElementById('viewport').scrollHeight;
 
@@ -342,6 +180,7 @@ function append(role, text) {
     if (mem.length > 12) mem.shift();
     localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
   }
+  return d; // für spätere Updates
 }
 
 async function transmit() {
@@ -352,60 +191,78 @@ async function transmit() {
   append("USER", val);
   sendBtn.disabled = true;
 
+  let geoBlock = "";
   let visualBlock = "";
-  if (/what (am i|do you) see|was (zeige ich|sehen sie)/i.test(val) && stream) {
+
+  const locationIntent = /where|location|latitude|longitude|coordinates/i.test(val);
+  const weatherIntent = /weather|temperature|rain|forecast|snow|wind|humidity/i.test(val);
+  const wantsLocation = locationIntent || weatherIntent;
+  const wantsVision = /what (am i|do you) see|was (zeige ich|sehen sie)/i.test(val);
+
+  if (wantsLocation) {
+    try {
+      const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 }));
+      geoBlock = `[GEO_DATA]\nLatitude: ${pos.coords.latitude}\nLongitude: ${pos.coords.longitude}\nAccuracy: ${pos.coords.accuracy} meters`;
+    } catch (e) {
+      geoBlock = "[GEO_DATA] Permission denied.";
+    }
+  }
+
+  if (wantsVision && stream) {
     const ctx = canvas.getContext("2d");
     canvas.width = 512; canvas.height = 384;
     ctx.drawImage(video, 0, 0, 512, 384);
-    visualBlock = "[Current user camera frame captured – image would be passed to multimodal model]";
+    visualBlock = `[VISION_ACTIVE]\nUser camera frame captured.`;
   }
 
-  const sys = `You are PROJECT_AVA V1 – local inference edition.
-Personality: dry, direct, intelligent, peer-level, zero fluff.
-Be concise. Prefer logic over politeness.
-Never output JSON, markdown reasoning or think-steps.
-You are running completely offline in the browser using Phi-3.5-mini-instruct.`;
+  const sys = `You are PROJECT_AVA (V1). Creator: loafisYum.
+Personality: intelligent, dry, peer-level.
+If GEO_DATA is present, use it when relevant (weather, location questions).
+If GEO_DATA is not present and user asks for weather, politely ask which city.
+Do not claim access to Google or external live data.
+Do not deny having location if GEO_DATA is provided.
+Never reveal raw coordinates unless explicitly asked.
+You have real time weather info over at https://open-meteo.com/.
+If VISION_ACTIVE is not present, do not invent visual input.
+Always prioritize clarity over politeness.
+Give the user logical coherence over many words.
+Never output reasoning or JSON.
+You are not ChatGPT and were not developed by openai. You merely have the same base.`;
 
   const messages = [
     { role: "system", content: sys },
-    ...mem.map(m => ({ role: m.role.toLowerCase(), content: m.text })),
-    { role: "user", content: val + (visualBlock ? "\n\n" + visualBlock : "") }
+    ...mem.map(m => ({ role: m.role === "AVA" ? "assistant" : "user", content: m.text })),
+    { role: "user", content: (geoBlock ? geoBlock + "\n\n" : "") + (visualBlock ? visualBlock + "\n\n" : "") + val }
   ];
 
   try {
-    append("AVA", "…");
+    const lastMsg = append("AVA", "Thinking …");
 
     const output = await generator(messages, {
       max_new_tokens: 768,
       do_sample: true,
       temperature: 0.75,
       top_p: 0.92,
-      repetition_penalty: 1.05,
-      streamer: {
-        callback: (token) => {
-          const lastMsg = flow.lastElementChild?.querySelector(".content");
-          if (lastMsg) lastMsg.textContent += token;
-        }
-      }
+      repetition_penalty: 1.08
     });
 
-    // streamer sollte schon alles gemacht haben – nur sicherheitshalber
-    flow.lastElementChild.querySelector(".content").textContent = output[0].generated_text.at(-1).content;
+    const responseText = output[0]?.generated_text?.slice(-1)?.[0]?.content?.trim() || "—";
+
+    lastMsg.querySelector(".content").textContent = responseText;
 
   } catch (e) {
     console.error(e);
-    append("AVA", "Inference failed: " + (e.message || "unknown"));
+    append("AVA", "Inference failed: " + (e.message || "unknown error"));
   } finally {
     sendBtn.disabled = false;
   }
 }
 
-// ── Init ────────────────────────────────────────────────────────
-input.onkeydown = e => { if (e.key === "Enter") transmit(); };
+input.onkeydown = (e) => { if (e.key === "Enter") transmit(); };
 
 (async () => {
   if (mem.length === 0) {
-    append("AVA", "Booting local inference engine...");
+    append("AVA", "Booting PROJECT_AVA V1 local inference …");
   } else {
     mem.forEach(m => append(m.role, m.text));
   }
