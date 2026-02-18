@@ -364,6 +364,7 @@ input{
 <script type="module">
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
+// 1. Core Configuration
 env.allowLocalModels = false;
 env.allowRemoteModels = true;
 env.cacheDir = 'project_ava_cache';
@@ -389,7 +390,7 @@ function setProgress(pct, txt = "") {
   if (txt) detail.textContent = txt;
 }
 
-// Fixed: Global scope exposure for HTML buttons
+// FIX: Functions must be attached to 'window' to work with HTML 'onclick'
 window.selectModel = (repo) => {
   chosenRepo = repo;
   document.getElementById('model-selection').style.display = 'none';
@@ -414,13 +415,13 @@ async function initModel() {
       loadingScreen.classList.remove('active');
       sendBtn.disabled = false;
       if (mem.length === 0) {
-          append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded. 100% local.`);
+          append("AVA", `PROJECT_AVA V1 online. ${chosenRepo.split('/').pop()} loaded.`);
       }
     }, 900);
   } catch (err) {
     console.error(err);
     detail.style.color = 'var(--error)';
-    detail.textContent = "Initialization failed. Try a smaller core.";
+    detail.textContent = "Initialization failed.";
   }
 }
 
@@ -431,41 +432,35 @@ window.opticLink = async () => {
       video.srcObject = stream;
       stage.style.display = "block";
       eyeBtn.classList.add("active");
-      append("AVA", "Optic Link activated.");
-    } catch (e) {
-      append("AVA", "Camera permission denied.");
-    }
+    } catch (e) { append("AVA", "Camera denied."); }
   } else {
     stream.getTracks().forEach(t => t.stop());
     stream = null;
     stage.style.display = "none";
     eyeBtn.classList.remove("active");
-    append("AVA", "Optic Link deactivated.");
   }
 };
 
 window.purge = () => {
-  if (!confirm("PURGE ALL MEMORY AND CACHE?")) return;
+  if (!confirm("PURGE ALL MEMORY?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
-  mem = [];
-  flow.innerHTML = "";
   location.reload();
 };
 
 function append(role, text) {
-  if (!text || !text.trim()) return;
+  if (!text) return;
   const d = document.createElement("div");
   d.className = "msg";
   const safe = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   d.innerHTML = `<div class="role">${role === 'AVA' ? 'PROJECT_AVA' : 'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
-  
   const vp = document.getElementById('viewport');
   vp.scrollTop = vp.scrollHeight;
   return d;
 }
 
+// FIX: Explicitly attached to window and added 'return_full_text: false'
 window.transmit = async () => {
   if (!generator || sendBtn.disabled) return;
   const val = input.value.trim();
@@ -473,67 +468,55 @@ window.transmit = async () => {
   
   input.value = "";
   append("USER", val);
-  mem.push({ role: "USER", text: val }); // Save user input to history
+  mem.push({ role: "USER", text: val });
   
   sendBtn.disabled = true;
-  let geo = "", vis = "";
-  
-  if (/where|location|weather/i.test(val)) {
-    try {
-      const pos = await new Promise((r, j) => navigator.geolocation.getCurrentPosition(r, j, { timeout: 5000 }));
-      geo = `[GEO_DATA] Lat: ${pos.coords.latitude}, Lon: ${pos.coords.longitude}`;
-    } catch (e) { geo = "[GEO_DATA] Unavailable."; }
-  }
-
-  if (/see|look|show/i.test(val) && stream) {
-    vis = `[VISION_ACTIVE] User camera frame captured. (Internal note: I am a text-only core; acknowledge attempt but explain I cannot see pixels yet).`;
-  }
-
-  const sys = `You are PROJECT_AVA (V1). Creator: loafisYum.
-Personality: intelligent, dry, peer-level. You are a local AI, not ChatGPT.
-Use GEO_DATA if provided for location context. 
-Prioritize logic. Never output JSON or raw coordinates.`;
+  const sys = `You are PROJECT_AVA (V1). Personality: intelligent, dry. You are a local AI.`;
 
   const messages = [
     { role: "system", content: sys },
     ...mem.map(m => ({ role: m.role === "AVA" ? "assistant" : "user", content: m.text })),
-    { role: "user", content: (geo ? geo + "\n" : "") + (vis ? vis + "\n" : "") + val }
+    { role: "user", content: val }
   ];
 
   try {
     const last = append("AVA", "Thinking …");
     
-    // Fixed: return_full_text: false ensures we only get the new reply
     const out = await generator(messages, { 
         max_new_tokens: 512, 
         do_sample: true, 
         temperature: 0.7,
-        return_full_text: false 
+        return_full_text: false // Stops AVA from repeating the user prompt
     });
 
     let resp = out[0].generated_text.trim();
     last.querySelector(".content").textContent = resp;
     
-    // Commit to persistent memory
     mem.push({ role: "AVA", text: resp });
     if (mem.length > 15) mem.shift();
     localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
 
   } catch (e) {
     console.error(e);
-    append("AVA", "Inference error. Core might be overloaded.");
+    append("AVA", "Inference error.");
   } finally {
     sendBtn.disabled = false;
   }
 };
 
-input.onkeydown = e => { if (e.key === "Enter") transmit(); };
+// FIX: Properly handle the Enter key
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        window.transmit();
+    }
+});
 
-// Restore existing session
+// Restore session
 if (mem.length > 0) {
   mem.forEach(m => append(m.role, m.text));
 } else {
-  append("AVA", "PROJECT_AVA V1 ready. Choose your core to begin.");
+  append("AVA", "PROJECT_AVA V1 ready. Choose your core.");
 }
 </script>
 </body>
