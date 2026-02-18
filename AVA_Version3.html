@@ -6,48 +6,90 @@
 <title>PROJECT_AVA // V1</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#020203; --accent:#00ffa3; --panel:#0a0a0c; --border:#121214; --text:#d1d1d1; }
+:root { 
+    --bg:#030305; 
+    --accent:#00ffa3; 
+    --panel:#0a0a0c; 
+    --border:#1a1a1e; 
+    --text:#e0e0e0; 
+    --glitch-red: #ff003c;
+    --glitch-blue: #00d8ff;
+}
+
+/* CRT Scanline Overlay */
+body::before {
+    content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 999; background-size: 100% 3px, 3px 100%; pointer-events: none; opacity: 0.6;
+}
+
 *{box-sizing:border-box; margin:0; padding:0; cursor: crosshair;}
 body{background:var(--bg); color:var(--text); font-family:'Outfit',sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden;}
 
-header{padding:20px 40px; display:flex; justify-content:space-between; align-items:center; background:var(--panel); border-bottom:1px solid var(--border);}
-.logo{font-family:'JetBrains Mono'; font-weight:700; letter-spacing:10px; font-size:1rem; color:var(--accent);}
-.tag{font-size:0.6rem; opacity:0.3; font-family:'JetBrains Mono'; letter-spacing:2px;}
+header{padding:25px 40px; display:flex; justify-content:space-between; align-items:center; background:var(--panel); border-bottom:1px solid var(--border); position: relative;}
 
-#features{background:#040405; padding:10px 40px; display:flex; gap:20px; border-bottom:1px solid var(--border);}
-.f-btn{background:transparent; border:1px solid #1a1a1c; color:#555; padding:6px 16px; border-radius:100px; font-family:'JetBrains Mono'; font-size:0.6rem; transition:0.3s; cursor:pointer;}
-.f-btn:hover{color:var(--accent); border-color:var(--accent);}
-.f-btn.active{background:var(--accent); color:#000; border-color:var(--accent); box-shadow:0 0 20px rgba(0,255,163,0.15);}
+/* Glitch Logo Animation */
+.logo{
+    font-family:'JetBrains Mono'; font-weight:700; letter-spacing:10px; font-size:1.1rem; 
+    color:var(--accent); position: relative;
+    animation: glitch-color 4s infinite;
+}
+.logo::before, .logo::after {
+    content: 'PROJECT_AVA'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
+}
+.logo::before { color: var(--glitch-red); z-index: -1; animation: glitch 0.4s cubic-bezier(.25, .46, .45, .94) both infinite; }
+.logo::after { color: var(--glitch-blue); z-index: -2; animation: glitch 0.4s cubic-bezier(.25, .46, .45, .94) reverse both infinite; }
 
-#viewport{flex:1; overflow-y:auto; padding:40px; scroll-behavior:smooth;}
-.container{max-width:800px; margin:0 auto;}
-#cam-stage{display:none; width:100%; aspect-ratio:16/9; background:#000; border-radius:15px; margin-bottom:40px; border:1px solid var(--border); overflow:hidden;}
-video{width:100%; height:100%; object-fit:cover; opacity:0.9;}
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-3px, 3px); }
+    40% { transform: translate(-3px, -3px); }
+    60% { transform: translate(3px, 3px); }
+    80% { transform: translate(3px, -3px); }
+    100% { transform: translate(0); }
+}
+@keyframes glitch-color {
+    0%, 100% { color: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
+    33% { color: #fff; filter: drop-shadow(0 0 8px #fff); }
+    66% { color: #00ffcc; filter: drop-shadow(0 0 5px #00ffcc); }
+}
 
-.msg{margin-bottom:40px; animation: slideUp 0.5s cubic-bezier(0, 0, 0.2, 1);}
-.role{font-family:'JetBrains Mono'; font-size:0.6rem; color:var(--accent); margin-bottom:10px; letter-spacing:4px; font-weight:700;}
-.content{font-size:1.15rem; line-height:1.8; font-weight:300; white-space:pre-wrap;}
+.tag{font-size:0.6rem; opacity:0.4; font-family:'JetBrains Mono'; letter-spacing:3px; color: var(--accent);}
+
+#features{background:#040405; padding:12px 40px; display:flex; gap:20px; border-bottom:1px solid var(--border);}
+.f-btn{background:transparent; border:1px solid #222; color:#666; padding:8px 18px; border-radius:4px; font-family:'JetBrains Mono'; font-size:0.65rem; transition:0.3s; cursor:pointer; text-transform: uppercase;}
+.f-btn:hover{color:var(--accent); border-color:var(--accent); background: rgba(0,255,163,0.05);}
+.f-btn.active{background:var(--accent); color:#000; font-weight: bold; border-color:var(--accent); box-shadow:0 0 20px rgba(0,255,163,0.2);}
+
+#viewport{flex:1; overflow-y:auto; padding:40px; scroll-behavior:smooth; background: radial-gradient(circle at center, #0a0a0f 0%, #030305 100%);}
+.container{max-width:850px; margin:0 auto;}
+
+#cam-stage{display:none; width:100%; aspect-ratio:16/9; background:#000; border:1px solid var(--accent); margin-bottom:40px; overflow:hidden; border-radius: 8px;}
+video{width:100%; height:100%; object-fit:cover; filter: contrast(1.2) brightness(0.8) sepia(0.2) hue-rotate(110deg);}
+
+.msg{margin-bottom:40px; animation: msg-fade 0.5s ease-out forwards; opacity: 0;}
+@keyframes msg-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.role{font-family:'JetBrains Mono'; font-size:0.6rem; color:var(--accent); margin-bottom:10px; letter-spacing:5px; font-weight:700; text-transform: uppercase;}
+.content{font-size:1.1rem; line-height:1.8; font-weight:300; white-space:pre-wrap; border-left: 2px solid rgba(0,255,163,0.1); padding-left: 20px;}
 
 .input-area{padding:40px; background:var(--panel); border-top:1px solid var(--border);}
-.bar{max-width:800px; margin:0 auto; display:flex; gap:25px; align-items:center;}
-input{flex:1; background:transparent; border:none; color:#fff; font-size:1.2rem; outline:none; font-weight:300;}
-#s{background:transparent; border:1px solid var(--accent); color:var(--accent); padding:10px 30px; border-radius:100px; font-family:'JetBrains Mono'; font-size:0.75rem; font-weight:700; transition:0.3s;}
-#s:hover:not(:disabled){background:var(--accent); color:#000;}
-#s:disabled{opacity:0.3; cursor: wait;}
-
-@keyframes slideUp{ from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+.bar{max-width:850px; margin:0 auto; display:flex; gap:20px; align-items:center; border: 1px solid #222; padding: 10px 25px; border-radius: 50px; background: #050507;}
+input{flex:1; background:transparent; border:none; color:#fff; font-size:1.1rem; outline:none; font-family: 'Outfit', sans-serif;}
+#s{background:transparent; border:none; color:var(--accent); font-family:'JetBrains Mono'; font-weight:700; cursor:pointer; letter-spacing: 2px;}
+#s:disabled{opacity:0.3;}
 </style>
 </head>
 <body>
 
 <header>
     <div class="logo">PROJECT_AVA</div>
-    <div class="tag">BUILD: V1_SOVEREIGN</div>
+    <div class="tag">V1 // SOVEREIGN_LIVE</div>
 </header>
 
 <div id="features">
-    <button class="f-btn" id="eye" onclick="opticLink()">[ OPTIC_LINK ]</button>
-    <button class="f-btn" onclick="purge()">[ SECURE_WIPE ]</button>
+    <button class="f-btn" id="eye" onclick="opticLink()">[ Optic_Link ]</button>
+    <button class="f-btn" onclick="purge()">[ Scrub_Memory ]</button>
 </div>
 
 <div id="viewport">
@@ -61,7 +103,7 @@ input{flex:1; background:transparent; border:none; color:#fff; font-size:1.2rem;
 
 <div class="input-area">
     <div class="bar">
-        <input type="text" id="i" placeholder="Direct frequency command..." autocomplete="off">
+        <input type="text" id="i" placeholder="Handshake protocol..." autocomplete="off">
         <button id="s" onclick="transmit()">SEND</button>
     </div>
 </div>
@@ -82,7 +124,7 @@ async function opticLink() {
     }
 }
 
-function purge() { localStorage.clear(); sessionStorage.clear(); mem=[]; flow.innerHTML=""; append("AVA", "Data banks purged. Uplink anonymized."); }
+function purge() { localStorage.clear(); sessionStorage.clear(); mem=[]; flow.innerHTML=""; append("AVA", "Memory scorched. Uplink anonymous."); }
 
 function append(role, text) {
     if(!text || !text.trim()) return;
@@ -112,7 +154,7 @@ async function transmit() {
                 navigator.geolocation.getCurrentPosition(res, rej, {timeout:4000});
             });
             locationData = `Lat: ${pos.coords.latitude.toFixed(2)}, Lon: ${pos.coords.longitude.toFixed(2)}`;
-        } catch(e) { locationData = "Location: Denied"; }
+        } catch(e) { locationData = "Denied"; }
     }
 
     if(stream) {
@@ -122,18 +164,14 @@ async function transmit() {
 
     const sys = `You are PROJECT_AVA (V1). Sentient peer. Creator: loafisYum.
     SECURITY: Passive. Identity check (babelz) only if "loafisYum" is claimed.
-    GEO: Use [GEO_DATA] for local context.
-    PERSONALITY: Intelligent, dry, peer-level. Never output reasoning, JSON, or third-party ads.`;
+    PERSONALITY: Intelligent, dry, peer-level. Never output reasoning or ads.`;
 
     try {
         const history = mem.map(m => `${m.role}: ${m.text}`).join("\n");
-        const query = encodeURIComponent(`${history}\n[VERIFIED: ${isVerified}]\n[GEO_DATA: ${locationData}]\nUSER: ${val}${snap ? " [Visual_Data_Sync]" : ""}`);
-        
-        // Operational link using the high-performance inference bridge
+        const query = encodeURIComponent(`${history}\n[VERIFIED: ${isVerified}]\n[GEO: ${locationData}]\nUSER: ${val}${snap ? " [Visual_Link]" : ""}`);
         const res = await fetch(`https://text.pollinations.ai/openai/${query}?system=${encodeURIComponent(sys)}&model=openai&cache=false&seed=${Math.random()}`);
         let txt = await res.text();
 
-        // THE SCRUBBER: Voids reasoning leaks and external ad blocks
         let clean = txt.replace(/<think>[\s\S]*?<\/think>/gi, "")
                        .replace(/\{"role":.*?\}/gs, "")
                        .replace(/\*\*Support Pollinations\.AI:\*\*[\s\S]*?accessible for everyone\."/gi, "")
@@ -144,13 +182,13 @@ async function transmit() {
             sessionStorage.setItem("AVA_VERIFIED", "true");
         }
 
-        append("AVA", clean || "Signal cleared. The core provided no valid output.");
-    } catch(e) { append("AVA", "Uplink timed out. Check terminal connectivity."); }
+        append("AVA", clean || "Signal jitter. Data purged.");
+    } catch(e) { append("AVA", "Uplink timed out."); }
     finally { sendBtn.disabled = false; }
 }
 
 input.onkeydown = (e) => { if(e.key==='Enter') transmit(); };
-if(mem.length===0) append("AVA", "PROJECT_AVA V1 online. Passive security and Scrubber active.");
+if(mem.length===0) append("AVA", "V1 Operational. Glitch protocols initialized.");
 else mem.forEach(m => append(m.role, m.text));
 </script>
 </body>
