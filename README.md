@@ -61,3 +61,5 @@ Local deployment mode
 Hybrid SLM/LLM compatibility
 
 Performance benchmarking
+
+(it can tell the weather)
