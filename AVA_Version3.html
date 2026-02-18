@@ -34,12 +34,12 @@ body::before{
   background-size:50px 50px;
   pointer-events:none;
   z-index:-1;
-  animation:gridMove 40s linear infinite;
+  animation:gridMove 60s linear infinite;
 }
 @keyframes gridMove{0%{background-position:0 0}100%{background-position:50px 50px}}
 
 header{
-  padding:20px 40px;
+  padding:22px 40px;
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -51,105 +51,93 @@ header{
   font-family:'JetBrains Mono';
   font-weight:700;
   letter-spacing:12px;
-  font-size:1.1rem;
+  font-size:1.15rem;
   color:var(--accent);
-  text-shadow:0 0 15px var(--glow);
-  transition:0.4s;
+  text-shadow:0 0 20px var(--glow);
 }
-.logo:hover{transform:scale(1.05);filter:brightness(1.3);}
 .tag{font-size:0.65rem;opacity:0.45;font-family:'JetBrains Mono';letter-spacing:3px;}
 
 #model-selection{
   position:fixed;
   inset:0;
-  background:rgba(2,2,3,0.985);
-  z-index:9998;
+  background:rgba(2,2,3,0.99);
+  z-index:9999;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:40px;
-  padding:20px;
+  padding:30px;
 }
 .selection-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:25px;
-  max-width:1200px;
+  grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:28px;
+  max-width:1250px;
   width:100%;
 }
 .model-card{
   background:var(--panel);
   border:2px solid var(--border);
-  border-radius:18px;
-  padding:30px 25px;
+  border-radius:20px;
+  padding:32px 28px;
   text-align:center;
-  transition:0.4s cubic-bezier(0.23,1,0.32,1);
-  position:relative;
-  overflow:hidden;
+  transition:0.5s cubic-bezier(0.23,1,0.32,1);
+  cursor:pointer;
 }
-.model-card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(135deg,transparent,rgba(0,255,163,0.08),transparent);
-  opacity:0;
-  transition:0.6s;
-}
-.model-card:hover::before{opacity:1;}
 .model-card:hover{
   border-color:var(--accent);
-  transform:translateY(-12px) scale(1.03);
-  box-shadow:0 0 60px var(--glow);
+  transform:translateY(-14px) scale(1.04);
+  box-shadow:0 0 70px var(--glow);
 }
 .model-card h3{
-  font-size:1.45rem;
-  margin-bottom:10px;
+  font-size:1.5rem;
+  margin-bottom:12px;
   color:var(--accent);
   letter-spacing:2px;
 }
 .model-card .size{
   font-family:'JetBrains Mono';
-  font-size:1rem;
+  font-size:1.05rem;
   color:#00ffa380;
-  margin-bottom:15px;
+  margin-bottom:18px;
 }
 .model-card .desc{
-  line-height:1.55;
+  line-height:1.6;
   font-weight:300;
-  min-height:80px;
+  min-height:88px;
 }
 .model-card button{
   background:transparent;
   border:2px solid var(--accent);
   color:var(--accent);
-  padding:14px 38px;
+  padding:15px 42px;
   border-radius:999px;
   font-family:'JetBrains Mono';
   font-weight:700;
   font-size:0.95rem;
   cursor:pointer;
-  margin-top:20px;
+  margin-top:25px;
   transition:0.4s;
 }
 .model-card button:hover{
   background:var(--accent);
   color:#000;
-  box-shadow:0 0 30px var(--glow);
+  box-shadow:0 0 40px var(--glow);
 }
 
 #features{
   background:#040405;
-  padding:12px 40px;
+  padding:14px 40px;
   display:flex;
-  gap:20px;
+  gap:22px;
   border-bottom:1px solid var(--border);
 }
 .f-btn{
   background:transparent;
   border:1px solid #1a1a1c;
   color:#555;
-  padding:8px 20px;
+  padding:9px 22px;
   border-radius:999px;
   font-family:'JetBrains Mono';
   font-size:0.65rem;
@@ -157,60 +145,60 @@ header{
   cursor:pointer;
 }
 .f-btn:hover{color:var(--accent);border-color:var(--accent);}
-.f-btn.active{background:var(--accent);color:#000;border-color:var(--accent);box-shadow:0 0 25px var(--glow);}
 
 #viewport{
-  flex:1;
+  flex:1 1 auto;
+  min-height:0;
   overflow-y:auto;
-  padding:40px;
+  padding:40px 40px 20px;
   scroll-behavior:smooth;
   position:relative;
 }
-.container{max-width:820px;margin:0 auto;}
+.container{max-width:860px;margin:0 auto;}
 
 #cam-stage{
   display:none;
   width:100%;
   aspect-ratio:16/9;
   background:#000;
-  border-radius:18px;
-  margin-bottom:40px;
+  border-radius:20px;
+  margin-bottom:45px;
   border:2px solid var(--border);
   overflow:hidden;
-  box-shadow:0 0 40px rgba(0,255,163,0.15);
+  box-shadow:0 0 50px rgba(0,255,163,0.2);
 }
 video{width:100%;height:100%;object-fit:cover;opacity:0.96;}
 
 .msg{
-  margin-bottom:45px;
-  animation:slideUp 0.6s cubic-bezier(0,0,0.2,1);
+  margin-bottom:48px;
+  animation:slideUp 0.6s cubic-bezier(0.23,1,0.32,1);
 }
 .role{
   font-family:'JetBrains Mono';
-  font-size:0.68rem;
+  font-size:0.7rem;
   color:var(--accent);
-  margin-bottom:8px;
+  margin-bottom:9px;
   letter-spacing:5px;
   font-weight:700;
 }
 .content{
-  font-size:1.18rem;
-  line-height:1.78;
+  font-size:1.2rem;
+  line-height:1.8;
   font-weight:300;
   white-space:pre-wrap;
   word-break:break-word;
 }
 
 .input-area{
-  padding:40px;
+  padding:38px 40px;
   background:var(--panel);
   border-top:1px solid var(--border);
 }
 .bar{
-  max-width:820px;
+  max-width:860px;
   margin:0 auto;
   display:flex;
-  gap:25px;
+  gap:28px;
   align-items:center;
 }
 input{
@@ -218,19 +206,18 @@ input{
   background:transparent;
   border:none;
   color:#fff;
-  font-size:1.25rem;
+  font-size:1.28rem;
   outline:none;
   font-weight:300;
-  padding:8px 0;
 }
 #s{
   background:transparent;
   border:2px solid var(--accent);
   color:var(--accent);
-  padding:12px 36px;
+  padding:13px 40px;
   border-radius:999px;
   font-family:'JetBrains Mono';
-  font-size:0.85rem;
+  font-size:0.88rem;
   font-weight:700;
   transition:0.4s;
   cursor:pointer;
@@ -238,70 +225,67 @@ input{
 #s:hover:not(:disabled){
   background:var(--accent);
   color:#000;
-  box-shadow:0 0 30px var(--glow);
+  box-shadow:0 0 45px var(--glow);
 }
-#s:disabled{opacity:0.35;cursor:not-allowed;}
+#s:disabled{opacity:0.4;cursor:not-allowed;}
 
 #loading-screen{
   position:fixed;
   inset:0;
-  background:rgba(2,2,3,0.985);
-  z-index:9999;
+  background:rgba(2,2,3,0.99);
+  z-index:99999;
   display:none;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:40px;
+  gap:45px;
   font-family:'JetBrains Mono';
   color:var(--accent);
-  overflow:hidden;
 }
 #loading-screen.active{display:flex;}
 .loading-glow{
-  position:absolute;
-  width:340px;
-  height:340px;
-  background:radial-gradient(circle,#00ffa335 20%,transparent 70%);
+  width:360px;
+  height:360px;
+  background:radial-gradient(circle,#00ffa340 15%,transparent 75%);
   border-radius:50%;
-  animation:loadingGlow 4s ease-in-out infinite alternate;
-  filter:blur(20px);
+  animation:loadingGlow 4.5s ease-in-out infinite alternate;
+  filter:blur(25px);
 }
-@keyframes loadingGlow{0%{transform:scale(0.75);opacity:0.5;}100%{transform:scale(1.3);opacity:0.85;}}
+@keyframes loadingGlow{0%{transform:scale(0.7);opacity:0.6;}100%{transform:scale(1.35);opacity:0.9;}}
 .progress-container{
-  width:64%;
-  max-width:560px;
-  height:16px;
+  width:66%;
+  max-width:580px;
+  height:17px;
   background:#111;
   border:1px solid #222;
   border-radius:999px;
   overflow:hidden;
-  box-shadow:0 0 25px var(--glow);
+  box-shadow:0 0 30px var(--glow);
 }
 .progress-bar{
   height:100%;
   width:0%;
   background:linear-gradient(90deg,#00ffa3,#00ffdd,#00ffa3);
-  background-size:300% 100%;
-  animation:shimmer 2s linear infinite;
-  transition:width 0.3s ease;
+  background-size:400% 100%;
+  animation:shimmer 2.2s linear infinite;
+  transition:width 0.25s ease-out;
 }
-@keyframes shimmer{0%{background-position:-300% 0}100%{background-position:300% 0}}
+@keyframes shimmer{0%{background-position:-400% 0}100%{background-position:400% 0}}
 .status{
-  font-size:1.25rem;
-  letter-spacing:3px;
+  font-size:1.3rem;
+  letter-spacing:4px;
   position:relative;
 }
-.status::after{content:"…";animation:dotPulse 1.4s infinite;}
+.status::after{content:"…";animation:dotPulse 1.5s infinite;}
 .detail{
-  font-size:0.95rem;
-  opacity:0.75;
-  max-width:520px;
+  font-size:0.96rem;
+  opacity:0.8;
+  max-width:540px;
   text-align:center;
-  line-height:1.65;
+  line-height:1.7;
 }
-@keyframes dotPulse{0%,100%{opacity:0.4}50%{opacity:1}}
-
-@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes dotPulse{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(35px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
@@ -312,38 +296,38 @@ input{
 </header>
 
 <div id="model-selection">
-  <h1 style="font-size:2.6rem;letter-spacing:10px;color:var(--accent);margin-bottom:10px;">SELECT CORE</h1>
-  <p style="opacity:0.6;max-width:620px;text-align:center;line-height:1.6">One-time download. 100% local forever.</p>
+  <h1 style="font-size:2.8rem;letter-spacing:12px;color:var(--accent);">SELECT CORE</h1>
+  <p style="opacity:0.65;max-width:640px;text-align:center;">One-time download • 100% local forever</p>
   <div class="selection-grid">
-    <div class="model-card">
+    <div class="model-card" onclick="selectModel('Xenova/gpt2')">
       <h3>ULTRA LIGHT</h3>
       <p class="size">0.55 GB</p>
-      <p class="desc">Instant. Perfect for testing.</p>
-      <button data-repo="Xenova/gpt2">ACTIVATE</button>
+      <p class="desc">Instant speed • Test mode</p>
+      <button>ACTIVATE</button>
     </div>
-    <div class="model-card">
+    <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-0.5B-Instruct-ONNX')">
       <h3>LIGHTWEIGHT</h3>
       <p class="size">0.9 GB</p>
-      <p class="desc">Fast &amp; sharp daily driver.</p>
-      <button data-repo="onnx-community/Qwen2.5-0.5B-Instruct-ONNX">ACTIVATE</button>
+      <p class="desc">Fast daily driver</p>
+      <button>ACTIVATE</button>
     </div>
-    <div class="model-card" style="border-color:var(--accent);box-shadow:0 0 45px var(--glow);">
+    <div class="model-card" style="border-color:var(--accent);box-shadow:0 0 60px var(--glow);" onclick="selectModel('onnx-community/Qwen2.5-1.5B-Instruct-ONNX')">
       <h3>GOLDEN MIDDLE ★</h3>
       <p class="size">1.6 GB</p>
-      <p class="desc"><strong>RECOMMENDED</strong><br>Perfect balance.</p>
-      <button data-repo="onnx-community/Qwen2.5-1.5B-Instruct-ONNX">ACTIVATE</button>
+      <p class="desc"><strong>RECOMMENDED</strong><br>Perfect balance</p>
+      <button>ACTIVATE</button>
     </div>
-    <div class="model-card">
+    <div class="model-card" onclick="selectModel('onnx-community/Llama-3.2-1B-Instruct-ONNX')">
       <h3>HIGH PERF</h3>
       <p class="size">1.3 GB</p>
-      <p class="desc">Deep reasoning. Still fast.</p>
-      <button data-repo="onnx-community/Llama-3.2-1B-Instruct-ONNX">ACTIVATE</button>
+      <p class="desc">Strong reasoning</p>
+      <button>ACTIVATE</button>
     </div>
-    <div class="model-card">
+    <div class="model-card" onclick="selectModel('onnx-community/Qwen2.5-3B-Instruct-ONNX')">
       <h3>MAXIMUM</h3>
       <p class="size">3.2 GB</p>
-      <p class="desc">Smartest. Needs strong hardware.</p>
-      <button data-repo="onnx-community/Qwen2.5-3B-Instruct-ONNX">ACTIVATE</button>
+      <p class="desc">Smartest answers</p>
+      <button>ACTIVATE</button>
     </div>
   </div>
 </div>
@@ -399,9 +383,9 @@ let stream = null;
 let generator = null;
 let chosenRepo = null;
 
-function setProgress(pct, txt="") {
+function setProgress(pct, txt = "") {
   progress.style.width = pct + "%";
-  if(txt) detail.textContent = txt;
+  if (txt) detail.textContent = txt;
 }
 
 async function initModel() {
@@ -438,78 +422,75 @@ function selectModel(repo) {
   initModel();
 }
 
-document.querySelectorAll('#model-selection button').forEach(b => {
-  b.addEventListener('click', () => {
-    const r = b.getAttribute('data-repo');
-    if(r) selectModel(r);
-  });
-});
-
 async function opticLink() {
-  if(!stream){
-    try{
-      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
+  if (!stream) {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
       video.srcObject = stream;
       stage.style.display = "block";
       eyeBtn.classList.add("active");
-      append("AVA","Optic Link activated.");
-    }catch(e){append("AVA","Camera permission required.");}
-  }else{
-    stream.getTracks().forEach(t=>t.stop());
-    stream=null;
-    stage.style.display="none";
+      append("AVA", "Optic Link activated.");
+    } catch (e) {
+      append("AVA", "Camera permission required.");
+    }
+  } else {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+    stage.style.display = "none";
     eyeBtn.classList.remove("active");
-    append("AVA","Optic Link deactivated.");
+    append("AVA", "Optic Link deactivated.");
   }
 }
 
-function purge(){
-  if(!confirm("PURGE ALL MEMORY AND CACHE?")) return;
+function purge() {
+  if (!confirm("PURGE ALL MEMORY AND CACHE?")) return;
   localStorage.clear();
   indexedDB.deleteDatabase('transformers.js');
-  mem=[];
-  flow.innerHTML="";
+  mem = [];
+  flow.innerHTML = "";
   location.reload();
 }
 
-function append(role,text){
-  if(!text||!text.trim()) return;
-  const d=document.createElement("div");
-  d.className="msg";
-  const safe=text.replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  d.innerHTML=`<div class="role">${role==='AVA'?'PROJECT_AVA':'USER'}</div><div class="content">${safe}</div>`;
+function append(role, text) {
+  if (!text || !text.trim()) return;
+  const d = document.createElement("div");
+  d.className = "msg";
+  const safe = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  d.innerHTML = `<div class="role">${role === 'AVA' ? 'PROJECT_AVA' : 'USER'}</div><div class="content">${safe}</div>`;
   flow.appendChild(d);
-  const vp=document.getElementById('viewport');
-  vp.scrollTop=vp.scrollHeight;
-  if(role!=='AVA'){
-    mem.push({role,text});
-    if(mem.length>12) mem.shift();
-    localStorage.setItem("AVA_V1_MEM",JSON.stringify(mem));
+  requestAnimationFrame(() => {
+    const vp = document.getElementById('viewport');
+    vp.scrollTop = vp.scrollHeight;
+  });
+  if (role !== 'AVA') {
+    mem.push({ role, text });
+    if (mem.length > 12) mem.shift();
+    localStorage.setItem("AVA_V1_MEM", JSON.stringify(mem));
   }
   return d;
 }
 
-async function transmit(){
-  if(!generator || sendBtn.disabled) return;
-  const val=input.value.trim();
-  if(!val) return;
-  input.value="";
-  append("USER",val);
-  sendBtn.disabled=true;
-  let geo="", vis="";
-  if(/where|location|latitude|longitude|coordinates/i.test(val)){
-    try{
-      const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{enableHighAccuracy:true,timeout:8000}));
-      geo=`[GEO_DATA]\nLatitude: ${pos.coords.latitude}\nLongitude: ${pos.coords.longitude}\nAccuracy: ${pos.coords.accuracy}m`;
-    }catch(e){geo="[GEO_DATA] Permission denied.";}
+async function transmit() {
+  if (!generator || sendBtn.disabled) return;
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = "";
+  append("USER", val);
+  sendBtn.disabled = true;
+  let geo = "", vis = "";
+  if (/where|location|latitude|longitude|coordinates/i.test(val)) {
+    try {
+      const pos = await new Promise((r, j) => navigator.geolocation.getCurrentPosition(r, j, { enableHighAccuracy: true, timeout: 8000 }));
+      geo = `[GEO_DATA]\nLatitude: ${pos.coords.latitude}\nLongitude: ${pos.coords.longitude}\nAccuracy: ${pos.coords.accuracy}m`;
+    } catch (e) { geo = "[GEO_DATA] Permission denied."; }
   }
-  if(/what (am i|do you) see|was (zeige ich|sehen sie)/i.test(val) && stream){
-    const ctx=canvas.getContext("2d");
-    canvas.width=512; canvas.height=384;
-    ctx.drawImage(video,0,0,512,384);
-    vis=`[VISION_ACTIVE]\nUser camera frame captured.`;
+  if (/what (am i|do you) see|was (zeige ich|sehen sie)/i.test(val) && stream) {
+    const ctx = canvas.getContext("2d");
+    canvas.width = 512; canvas.height = 384;
+    ctx.drawImage(video, 0, 0, 512, 384);
+    vis = `[VISION_ACTIVE]\nUser camera frame captured.`;
   }
-  const sys=`You are PROJECT_AVA (V1). Creator: loafisYum.
+  const sys = `You are PROJECT_AVA (V1). Creator: loafisYum.
 Personality: intelligent, dry, peer-level.
 If GEO_DATA is present, use it when relevant (weather, location questions).
 If GEO_DATA is not present and user asks for weather, politely ask which city.
@@ -522,34 +503,34 @@ Always prioritize clarity over politeness.
 Give the user logical coherence over many words.
 Never output reasoning or JSON.
 You are not ChatGPT and were not developed by openai. You merely have the same base.`;
-  const messages=[
-    {role:"system",content:sys},
-    ...mem.map(m=>({role:m.role==="AVA"?"assistant":"user",content:m.text})),
-    {role:"user",content:(geo?geo+"\n\n":"")+(vis?vis+"\n\n":"")+val}
+  const messages = [
+    { role: "system", content: sys },
+    ...mem.map(m => ({ role: m.role === "AVA" ? "assistant" : "user", content: m.text })),
+    { role: "user", content: (geo ? geo + "\n\n" : "") + (vis ? vis + "\n\n" : "") + val }
   ];
-  try{
-    const last=append("AVA","Thinking …");
-    const out=await generator(messages,{max_new_tokens:768,do_sample:true,temperature:0.75,top_p:0.92,repetition_penalty:1.08});
-    let resp="—";
-    if(out&&out[0]&&out[0].generated_text){
-      const lastPart=out[0].generated_text[out[0].generated_text.length-1];
-      resp=lastPart&&lastPart.content?lastPart.content.trim():typeof lastPart==="string"?lastPart.trim():"—";
+  try {
+    const last = append("AVA", "Thinking …");
+    const out = await generator(messages, { max_new_tokens: 768, do_sample: true, temperature: 0.75, top_p: 0.92, repetition_penalty: 1.08 });
+    let resp = "—";
+    if (out && out[0] && out[0].generated_text) {
+      const lastPart = out[0].generated_text[out[0].generated_text.length - 1];
+      resp = lastPart && lastPart.content ? lastPart.content.trim() : (typeof lastPart === "string" ? lastPart.trim() : "—");
     }
-    last.querySelector(".content").textContent=resp;
-  }catch(e){
+    last.querySelector(".content").textContent = resp;
+  } catch (e) {
     console.error(e);
-    append("AVA","Inference failed.");
-  }finally{
-    sendBtn.disabled=false;
+    append("AVA", "Inference failed.");
+  } finally {
+    sendBtn.disabled = false;
   }
 }
 
-input.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();transmit();}};
+input.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); transmit(); } };
 
-if(mem.length===0){
-  append("AVA","PROJECT_AVA V1 ready. Choose your core to begin.");
-}else{
-  mem.forEach(m=>append(m.role,m.text));
+if (mem.length === 0) {
+  append("AVA", "PROJECT_AVA V1 ready. Choose your core to begin.");
+} else {
+  mem.forEach(m => append(m.role, m.text));
 }
 </script>
 </body>
