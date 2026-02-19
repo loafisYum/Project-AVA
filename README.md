@@ -63,3 +63,5 @@ Hybrid SLM/LLM compatibility
 Performance benchmarking
 
 (it can tell the weather)
+
+(Keep in mind that AVA Is not my own ai)
