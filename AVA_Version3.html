@@ -11,9 +11,9 @@
 body {
   margin: 0;
   padding: 0;
-  background: #0e1117;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  color: #e6edf3;
+  background: #010b00;
+  font-family: "Courier New", Courier, monospace;
+  color: #33ff33;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -21,16 +21,49 @@ body {
 
 header {
   padding: 14px 20px;
-  border-bottom: 1px solid #1f2937;
-  font-weight: 600;
+  border-bottom: 1px solid #004400;
+  font-weight: 700;
   letter-spacing: 1px;
-  background: #0b0f14;
+  background: #001100;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glitch effect */
+header::before, header::after {
+  content: "Project_AVA V1.3";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  opacity: 0.8;
+  color: #00ff44;
+  clip: rect(0, 100%, 0, 0);
+  animation: glitch 2s infinite;
+}
+header::after {
+  color: #00ffaa;
+  animation-delay: 1s;
+}
+
+@keyframes glitch {
+  0% { clip: rect(2px, 9999px, 5px, 0); transform: translate(-2px, -1px); }
+  10% { clip: rect(10px, 9999px, 20px, 0); transform: translate(2px, 1px); }
+  20% { clip: rect(5px, 9999px, 10px, 0); transform: translate(-1px, 2px); }
+  30% { clip: rect(15px, 9999px, 18px, 0); transform: translate(1px, -1px); }
+  40% { clip: rect(0px, 9999px, 5px, 0); transform: translate(-1px, 0px); }
+  50% { clip: rect(10px, 9999px, 12px, 0); transform: translate(2px, 1px); }
+  60% { clip: rect(3px, 9999px, 7px, 0); transform: translate(-1px, -2px); }
+  70% { clip: rect(5px, 9999px, 12px, 0); transform: translate(0px, 1px); }
+  80% { clip: rect(12px, 9999px, 15px, 0); transform: translate(-2px, 0px); }
+  90% { clip: rect(2px, 9999px, 6px, 0); transform: translate(1px, -1px); }
+  100% { clip: rect(0px, 9999px, 5px, 0); transform: translate(0px, 0px); }
 }
 
 #chat {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  background: #001100;
 }
 
 .message {
@@ -39,13 +72,13 @@ header {
   white-space: pre-wrap;
 }
 
-.user { color: #58a6ff; }
-.assistant { color: #3fb950; }
+.user { color: #00ffaa; }
+.assistant { color: #33ff33; }
 
 #inputContainer {
   display: flex;
-  border-top: 1px solid #1f2937;
-  background: #0b0f14;
+  border-top: 1px solid #004400;
+  background: #001100;
 }
 
 #input {
@@ -53,29 +86,52 @@ header {
   padding: 14px;
   background: transparent;
   border: none;
-  color: #e6edf3;
+  color: #33ff33;
   font-size: 14px;
   outline: none;
 }
 
 #sendBtn {
   padding: 14px 22px;
-  background: #1f6feb;
+  background: #009900;
   border: none;
-  color: white;
+  color: #001100;
   cursor: pointer;
   transition: background 0.2s ease;
+  font-weight: bold;
 }
 
-#sendBtn:hover { background: #388bfd; }
+#sendBtn:hover { background: #00cc00; }
 
 #statusBar {
   font-size: 12px;
   padding: 6px 20px;
-  background: #0b0f14;
-  border-top: 1px solid #1f2937;
-  color: #8b949e;
+  background: #001100;
+  border-top: 1px solid #004400;
+  color: #009900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+
+/* Progress Bar */
+#progressContainer {
+  flex: 1;
+  height: 6px;
+  background: #003300;
+  margin-left: 10px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#progressBar {
+  width: 0%;
+  height: 100%;
+  background: #00ff33;
+  transition: width 0.1s linear;
+  border-radius: 3px;
+}
+
 </style>
 </head>
 
@@ -91,26 +147,23 @@ header {
 </div>
 
 <div id="statusBar">
-Engine Priority: Ollama → Pollinations → Offline Core
+  Engine Priority: Ollama → Pollinations → Offline Core
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+  </div>
 </div>
 
 <script>
 const chatEl = document.getElementById("chat");
 const inputEl = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
+const progressBar = document.getElementById("progressBar");
 
 let busy = false;
 
 let conversation = [
-  {
-    role: "system",
-    content: "You are Project_AVA. Direct. Efficient. No fluff."
-  }
+  { role: "system", content: "You are Project_AVA. Direct. Efficient. No fluff." }
 ];
-
-/* ------------------------------
-   Message Handling
---------------------------------*/
 
 function appendMessage(role, text) {
   const div = document.createElement("div");
@@ -120,10 +173,7 @@ function appendMessage(role, text) {
   chatEl.scrollTop = chatEl.scrollHeight;
 }
 
-/* ------------------------------
-   Input Handling
---------------------------------*/
-
+/* ------------------------------ Input Handling ------------------------------ */
 sendBtn.onclick = sendMessage;
 inputEl.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
@@ -132,10 +182,7 @@ inputEl.addEventListener("keydown", e => {
   }
 });
 
-/* ------------------------------
-   Core Send
---------------------------------*/
-
+/* ------------------------------ Core Send ------------------------------ */
 async function sendMessage() {
   if (busy) return;
 
@@ -144,121 +191,87 @@ async function sendMessage() {
 
   inputEl.value = "";
   appendMessage("user", text);
-
   conversation.push({ role: "user", content: text });
 
   busy = true;
+  progressBar.style.width = "0%";
 
   let reply = "";
 
-  // Attempt 1: Ollama
-  try {
-    reply = await queryOllama(conversation);
-  } catch {}
-
-  // Attempt 2: Pollinations
-  if (!reply) {
-    try {
-      reply = await queryPollinations(conversation);
-    } catch {}
-  }
-
-  // Attempt 3: Offline Brain
-  if (!reply) {
-    reply = offlineCore(text);
-  }
+  try { reply = await queryOllama(conversation, true); } catch {}
+  if (!reply) { try { reply = await queryPollinations(conversation, true); } catch {} }
+  if (!reply) { reply = offlineCore(text); }
 
   conversation.push({ role: "assistant", content: reply });
   appendMessage("assistant", reply);
 
+  progressBar.style.width = "0%";
   busy = false;
 }
 
-/* ------------------------------
-   Ollama
---------------------------------*/
-
-async function queryOllama(messages) {
+/* ------------------------------ Ollama ------------------------------ */
+async function queryOllama(messages, showProgress = false) {
   const res = await fetch("http://localhost:11434/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "llama3",
-      messages: messages,
-      stream: false
-    })
+    body: JSON.stringify({ model: "llama3", messages: messages, stream: false })
   });
-
   if (!res.ok) throw new Error();
-
   const data = await res.json();
-
   if (!data.message || !data.message.content) throw new Error();
+
+  // Fake progress animation
+  if (showProgress) await animateProgress(data.message.content.length);
 
   return data.message.content.trim();
 }
 
-/* ------------------------------
-   Pollinations
---------------------------------*/
-
-async function queryPollinations(messages) {
-  const history = messages
-    .map(m => m.role + ": " + m.content)
-    .join("\n");
-
+/* ------------------------------ Pollinations ------------------------------ */
+async function queryPollinations(messages, showProgress = false) {
+  const history = messages.map(m => m.role + ": " + m.content).join("\n");
   const encoded = encodeURIComponent(history);
-
-  const res = await fetch(
-    "https://text.pollinations.ai/openai/" +
-    encoded +
-    "?model=openai&cache=false&seed=" +
-    Math.random()
-  );
-
+  const res = await fetch("https://text.pollinations.ai/openai/" + encoded + "?model=openai&cache=false&seed=" + Math.random());
   if (!res.ok) throw new Error();
-
   let text = await res.text();
-
   if (!text || text.length < 2) throw new Error();
-
+  if (showProgress) await animateProgress(text.length);
   return cleanPollinations(text);
 }
 
 function cleanPollinations(txt) {
-  return txt
-    .replace(/<think>[\s\S]*?<\/think>/gi, "")
-    .replace(/\*\*Support[\s\S]*?\*\*/gi, "")
-    .replace(/🌸[\s\S]*?🌸/gi, "")
-    .trim();
+  return txt.replace(/<think>[\s\S]*?<\/think>/gi, "")
+            .replace(/\*\*Support[\s\S]*?\*\*/gi, "")
+            .replace(/🌸[\s\S]*?🌸/gi, "")
+            .trim();
 }
 
-/* ------------------------------
-   Offline Core
---------------------------------*/
-
+/* ------------------------------ Offline Core ------------------------------ */
 function offlineCore(input) {
   const lower = input.toLowerCase();
-
   if (lower.includes("hello")) return "Hello.";
   if (lower.includes("time")) return new Date().toLocaleTimeString();
   if (lower.includes("date")) return new Date().toDateString();
   if (lower.includes("who are you")) return "Project_AVA offline core.";
-
   return "Local systems operational. No external model reachable.";
 }
 
-/* ------------------------------
-   Stability Guard
---------------------------------*/
+/* ------------------------------ Progress Bar ------------------------------ */
+function animateProgress(chars) {
+  return new Promise(resolve => {
+    let width = 0;
+    const interval = setInterval(() => {
+      width += Math.random() * 5; // random speed
+      if (width >= 100) { width = 100; clearInterval(interval); resolve(); }
+      progressBar.style.width = width + "%";
+    }, 50);
+  });
+}
 
+/* ------------------------------ Stability Guard ------------------------------ */
 window.addEventListener("unhandledrejection", () => {});
 window.addEventListener("error", () => {});
 
-/* ------------------------------
-   Auto Focus
---------------------------------*/
-
+/* ------------------------------ Auto Focus ------------------------------ */
 inputEl.focus();
 </script>
 
